@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "lib": ["ESNext", "DOM"],
+    "moduleResolution": "Node",
+    "types": ["vite/client"],
+    "strict": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "skipLibCheck": true
+  },
+  "include": ["src"]
+}
