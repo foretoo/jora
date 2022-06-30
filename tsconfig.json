@@ -4,9 +4,11 @@
     "module": "ESNext",
     "lib": ["ESNext", "DOM"],
     "moduleResolution": "Node",
-    "types": ["vite/client"],
+    "types": ["vite/client", "@types/three"],
     "strict": true,
+    "resolveJsonModule": true,
     "isolatedModules": true,
+    "esModuleInterop": true,
     "noEmit": true,
     "skipLibCheck": true
   },
