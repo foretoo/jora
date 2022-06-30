@@ -18,7 +18,7 @@ const scene = new Scene()
 // Camera
 const aspect = width / height
 const camera = new PerspectiveCamera(75, aspect, 0.1, 100)
-camera.position.set(0, 0, 3)
+camera.position.set(0, 0, 2)
 scene.add(camera)
 
 const controls = new OrbitControls(camera, canvas)
