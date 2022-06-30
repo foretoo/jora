@@ -1,2 +1,4 @@
 node_modules
+_three.js
 dist
+lib
