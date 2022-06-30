@@ -1,4 +1,5 @@
 import "./style.sass"
-import { loop } from "./08-screen"
+import { loop } from "./init"
+import { play } from "./09-geometry"
 
-loop()
+loop(play)
