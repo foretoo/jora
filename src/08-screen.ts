@@ -1,4 +1,4 @@
-import { Scene, Group, Mesh, BoxGeometry, MeshBasicMaterial, Color, AxesHelper, OrthographicCamera, PerspectiveCamera, WebGLRenderer } from "three"
+import { Scene, Group, Mesh, BufferGeometry, BoxGeometry, BufferAttribute, MeshBasicMaterial, Color, AxesHelper, OrthographicCamera, PerspectiveCamera, WebGLRenderer } from "three"
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js"
 
 
@@ -16,7 +16,7 @@ const canvas = document.querySelector("canvas")!
 // Scene
 const scene = new Scene()
 
-// Red cube
+// Cubes
 const csn = 5, off = (csn / 2) - 0.5
 const group = new Group()
 for (let x = 0; x < csn; x++) {
@@ -35,6 +35,8 @@ for (let x = 0; x < csn; x++) {
 }
 group.scale.multiplyScalar(2 / csn)
 scene.add(group)
+
+
 
 // Axes
 const axes = new AxesHelper(100)
