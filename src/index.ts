@@ -1,4 +1,4 @@
 import "./style.sass"
-import { loop } from "./07-cameras"
+import { loop } from "./08-screen"
 
 loop()
