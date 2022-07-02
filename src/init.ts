@@ -1,4 +1,4 @@
-import { Scene, Group, Mesh, BufferGeometry, BoxGeometry, BufferAttribute, MeshBasicMaterial, Color, AxesHelper, OrthographicCamera, PerspectiveCamera, WebGLRenderer } from "three"
+import { Scene, PerspectiveCamera, WebGLRenderer } from "three"
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js"
 
 
