@@ -1,5 +1,5 @@
 import { Mesh, BufferGeometry, BufferAttribute, MeshBasicMaterial } from "three"
-import { scene } from "./init"
+import { scene } from "../init"
 import gsap from "gsap"
 import * as dat from "dat.gui"
 

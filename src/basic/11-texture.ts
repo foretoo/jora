@@ -1,5 +1,5 @@
 import { Mesh, BoxGeometry, MeshBasicMaterial, Texture, TextureLoader, LoadingManager, DoubleSide, NearestFilter, LinearFilter, NearestMipmapNearestFilter, NearestMipMapLinearFilter, LinearMipMapLinearFilter, LinearMipmapNearestFilter } from "three"
-import { scene } from "./init"
+import { scene } from "../init"
 
 
 

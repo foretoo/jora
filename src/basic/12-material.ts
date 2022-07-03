@@ -1,5 +1,5 @@
 import { Mesh, BoxGeometry, MeshBasicMaterial, Texture, TextureLoader, LoadingManager, DoubleSide, SphereGeometry, PlaneGeometry, TorusGeometry, MeshNormalMaterial, MeshMatcapMaterial, AmbientLight, PointLight, MeshLambertMaterial, MeshPhongMaterial, Color, MeshToonMaterial, NearestFilter, MeshStandardMaterial, BufferAttribute, CubeTextureLoader } from "three"
-import { scene, camera } from "./init"
+import { scene, camera } from "../init"
 import * as dat from "dat.gui"
 
 
