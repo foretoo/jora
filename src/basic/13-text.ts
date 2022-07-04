@@ -1,7 +1,7 @@
 import { TextureLoader, MeshMatcapMaterial, Mesh, TorusBufferGeometry } from "three"
 import { FontLoader } from "three/examples/jsm/loaders/FontLoader"
 import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry"
-import { scene, camera } from "../init"
+import { scene } from "../init"
 
 
 
