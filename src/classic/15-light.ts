@@ -1,4 +1,4 @@
-import { TextureLoader, MeshMatcapMaterial, Mesh, MeshStandardMaterial, SphereBufferGeometry, AmbientLight, PlaneBufferGeometry, BoxBufferGeometry, TorusBufferGeometry, DirectionalLight, HemisphereLight, PointLight, RectAreaLight, Vector3, SpotLight, HemisphereLightHelper, DirectionalLightHelper, PointLightHelper, Vector2, Object3D, SpotLightHelper } from "three"
+import { Mesh, MeshStandardMaterial, SphereBufferGeometry, AmbientLight, PlaneBufferGeometry, BoxBufferGeometry, TorusBufferGeometry, DirectionalLight, HemisphereLight, PointLight, RectAreaLight, SpotLight, HemisphereLightHelper, DirectionalLightHelper, PointLightHelper, SpotLightHelper } from "three"
 import { RectAreaLightHelper } from "three/examples/jsm/helpers/RectAreaLightHelper"
 import { TransformControls } from "three/examples/jsm/controls/TransformControls"
 import { scene, camera, orbit, canvas } from "../init"
