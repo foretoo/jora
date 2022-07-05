@@ -21,8 +21,14 @@ const camera = new PerspectiveCamera(75, aspect, 0.1, 100)
 camera.position.set(0, 0, 2)
 scene.add(camera)
 
+const logs = document.querySelector("#logs")!
 const orbit = new OrbitControls(camera, canvas)
-orbit.enableDamping = true
+// orbit.enableDamping = true
+orbit.addEventListener("change", (e) => {
+  logs.innerHTML =
+    `pos: (${camera.position.x.toFixed(4)}, ${camera.position.y.toFixed(4)}, ${camera.position.z.toFixed(4)})\n` +
+    `rot: (${camera.rotation.x.toFixed(4)}, ${camera.rotation.y.toFixed(4)}, ${camera.rotation.z.toFixed(4)})`
+})
 
 
 // Renderer
