@@ -21,8 +21,8 @@ const camera = new PerspectiveCamera(75, aspect, 0.1, 100)
 camera.position.set(0, 0, 2)
 scene.add(camera)
 
-const controls = new OrbitControls(camera, canvas)
-controls.enableDamping = true
+const orbit = new OrbitControls(camera, canvas)
+orbit.enableDamping = true
 
 
 // Renderer
@@ -56,7 +56,7 @@ let _callback: (() => void) | undefined
 const loop = (callback?: () => void) => {
   _callback = callback
   const commontask = () => {
-    controls.update()
+    orbit.update()
     renderer.render(scene, camera)
   }
   const callbackLooper = () => {
@@ -76,6 +76,7 @@ export {
   height,
   scene,
   camera,
+  orbit,
   renderer,
   canvas,
   loop,
