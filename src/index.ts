@@ -1,5 +1,5 @@
 import "./style.sass"
 import { loop } from "./init"
-import { play } from "./basic/13-text"
+import { play } from "./classic/15-light"
 
 loop(play)
