@@ -23,7 +23,7 @@ scene.add(camera)
 
 const logs = document.querySelector("#logs")!
 const orbit = new OrbitControls(camera, canvas)
-// orbit.enableDamping = true
+
 orbit.addEventListener("change", (e) => {
   logs.innerHTML =
     `pos: (${camera.position.x.toFixed(4)}, ${camera.position.y.toFixed(4)}, ${camera.position.z.toFixed(4)})\n` +
