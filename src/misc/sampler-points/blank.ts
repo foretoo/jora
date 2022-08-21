@@ -1,13 +1,6 @@
-import { Mesh } from "three/src/objects/Mesh"
-import { BufferGeometry } from "three/src/core/BufferGeometry"
-import { BufferAttribute } from "three/src/core/BufferAttribute"
-import { Vector3 } from "three/src/math/Vector3"
+import { BufferAttribute, BufferGeometry, DodecahedronBufferGeometry, Mesh, Points, ShaderMaterial, Vector3 } from "three"
 import { MeshSurfaceSampler } from "three/examples/jsm/math/MeshSurfaceSampler.js"
 import { scene } from "../../init"
-import { ShaderMaterial } from "three/src/materials/ShaderMaterial"
-import { Points } from "three/src/objects/Points"
-import { DodecahedronBufferGeometry } from "three/src/geometries/DodecahedronGeometry"
-
 import vertexShader from "./vertex.glsl"
 import fragmentShader from "./fragment.glsl"
 

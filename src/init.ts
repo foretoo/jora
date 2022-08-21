@@ -1,7 +1,5 @@
-import { PerspectiveCamera } from "three/src/cameras/PerspectiveCamera"
-import { WebGLRenderer } from "three/src/renderers/WebGLRenderer"
-import { Scene } from "three/src/scenes/Scene"
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js"
+import { PerspectiveCamera, Scene, WebGLRenderer } from "three"
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
 
 
 
