@@ -10,7 +10,8 @@
     "isolatedModules": true,
     "esModuleInterop": true,
     "noEmit": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "typeRoots": ["src/glsl.d.ts"]
   },
   "include": ["src"],
   "exclude": ["src/lib"]
