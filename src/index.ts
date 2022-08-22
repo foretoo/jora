@@ -1,5 +1,5 @@
 import "./style.sass"
 import { loop } from "./init"
-import { play } from "./misc/sampler-points"
+import { play } from "./classic/17-house"
 
-play()
+loop(play)
