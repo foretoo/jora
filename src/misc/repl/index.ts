@@ -1,6 +1,6 @@
 import { createPSProgram } from "./createPSProgram"
 import { OrbitControls } from "./orbitControls"
-import { thomasAttractorTick } from "./attractors"
+import { aizawaAttractorTick, halvorsenAttractorTick, sprottAttractorTick, thomasAttractorTick } from "./attractors"
 import { fArray } from "./utils"
 import { createPlayer } from "./createPlayer"
 
