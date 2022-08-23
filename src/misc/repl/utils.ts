@@ -14,3 +14,11 @@ export const randomSpherePoint = (
     z + (radius * Math.cos(phi)),
   ]
 }
+
+type Mapper = <T>(value: T, index: number, array: T[]) => number
+export const fArray = (
+  n: number,
+  mapper: Mapper
+) => {
+  return new Float32Array(Array(n).fill(0).map(mapper))
+}
