@@ -5,8 +5,8 @@ type PointData = { x: number, y: number, a1: number, a2: number }
 export type Orbit = { a1: number, a2: number, k: number }
 
 export function OrbitControls(
-  a1 = Math.random() * 4 - 2,
-  a2 = Math.random() * 4 - 2,
+  a1 = -0.8,
+  a2 = 1,
   k = 100,
   p: PointData | null = null
 ) {
@@ -17,6 +17,7 @@ export function OrbitControls(
   listen("wheel", (e) => {
     const dir = Math.sign((e as WheelEvent).deltaY)
     out.k *= 1 - dir * 0.1
+    console.log(out)
   })
   
   listen("mouseup", () => {
@@ -36,6 +37,7 @@ export function OrbitControls(
     if (p) {
       out.a1 = p.a1 - (e.x - p.x) / 100
       out.a2 = p.a2 - (e.y - p.y) / 100
+      console.log(out)
     }
   })
 
