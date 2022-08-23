@@ -50,8 +50,8 @@ export function OrbitControls(
   canvas.addEventListener("touchstart", (e) => {
     e.preventDefault()
     p = {
-      x: e.touches[0].screenX,
-      y: e.touches[0].screenY,
+      x: e.touches[0].clientX,
+      y: e.touches[0].clientY,
       a1: out.a1,
       a2: out.a2,
     }
@@ -59,8 +59,8 @@ export function OrbitControls(
   canvas.addEventListener("touchmove", (e) => {
     e.preventDefault()
     if (p) {
-      out.a1 = p.a1 - (e.touches[0].screenX - p.x) / 100
-      out.a2 = p.a2 - (e.touches[0].screenY - p.y) / 100
+      out.a1 = p.a1 - (e.touches[0].clientX - p.x) / 100
+      out.a2 = p.a2 - (e.touches[0].clientY - p.y) / 100
     }
   })
 
