@@ -2,6 +2,7 @@ import { createPSProgram } from "./createPSProgram"
 import { OrbitControls } from "./orbitControls"
 import { thomasAttractorTick } from "./attractors"
 import { fArray } from "./utils"
+import { createPlayer } from "./createPlayer"
 
 const canvas = document.querySelector("canvas")!
 const pr = Math.min(devicePixelRatio, 2)
@@ -19,14 +20,9 @@ const controls = OrbitControls()
 
 
 
-export function play(t: number) {
+export const play = createPlayer((t: number) => {
   gl.clear(gl.COLOR_BUFFER_BIT)
 
   thomasAttractorTick(positionData, t)
   particles(positionData, innerWidth, innerHeight, t, controls)
-
-  requestAnimationFrame(play)
-}
-
-
-
+})
