@@ -32,20 +32,17 @@ export const  createScreenProgram = (
 
 
   const bufferId = gl.createBuffer()
-  const loc = gl.getAttribLocation(programId, "pt")
-
   gl.bindBuffer(gl.ARRAY_BUFFER, bufferId)
-  gl.bufferData(gl.ARRAY_BUFFER, screenTriangle, gl.DYNAMIC_DRAW)
+  gl.bufferData(gl.ARRAY_BUFFER, screenTriangle, gl.STATIC_DRAW)
 
+  const loc = gl.getAttribLocation(programId, "pt")
   gl.enableVertexAttribArray(loc)
-  gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0)
 
 
 
   return () => {
     gl.useProgram(programId)
 
-    gl.enableVertexAttribArray(loc)
     gl.bindBuffer(gl.ARRAY_BUFFER, bufferId)
     gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0)
 

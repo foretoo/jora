@@ -1,6 +1,6 @@
 import { Controls } from "."
 
-export const createThomasProgram = (
+export const createPSProgram = (
   gl: WebGLRenderingContext,
   thomasPoints: Float32Array,
 ) => {
@@ -51,12 +51,7 @@ export const createThomasProgram = (
 
   const bufferId = gl.createBuffer()
   const ptLoc = gl.getAttribLocation(programId, "pt")
-
-  gl.bindBuffer(gl.ARRAY_BUFFER, bufferId)
-  gl.bufferData(gl.ARRAY_BUFFER, thomasPoints, gl.STATIC_DRAW)
-
   gl.enableVertexAttribArray(ptLoc)
-  gl.vertexAttribPointer(ptLoc, 3, gl.FLOAT, false, 0, 0)
 
 
 
@@ -78,7 +73,7 @@ export const createThomasProgram = (
     gl.useProgram(programId)
 
     gl.bindBuffer(gl.ARRAY_BUFFER, bufferId)
-    gl.bufferData(gl.ARRAY_BUFFER, thomasPoints, gl.STATIC_DRAW)
+    gl.bufferData(gl.ARRAY_BUFFER, thomasPoints, gl.DYNAMIC_DRAW)
     gl.vertexAttribPointer(ptLoc, 3, gl.FLOAT, false, 0, 0)
 
     gl.uniform2f(resolutionLoc, width, height)

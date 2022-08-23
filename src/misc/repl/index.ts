@@ -1,5 +1,5 @@
 import { createScreenProgram } from "./createScreenProgram"
-import { createThomasProgram } from "./createThomasProgram"
+import { createPSProgram } from "./createPSProgram"
 
 const canvas = document.querySelector("canvas")!
 const pr = Math.min(devicePixelRatio, 2)
@@ -16,7 +16,7 @@ const clearPass = createScreenProgram(gl, fullScreenTriangle)
 
 
 
-const thomasAttractor = new Float32Array(
+const positionData = new Float32Array(
   Array(100000).fill(0).map(() => Math.random() * 6 - 3)
 )
 
@@ -71,18 +71,15 @@ function OrbitControls(
 
 const controls = OrbitControls()
 
-const particles = createThomasProgram(gl, thomasAttractor)
+const particles = createPSProgram(gl, positionData)
 
 
 
 export function play(t: number) {
-  thomasAttractorTick(thomasAttractor, t)
+  thomasAttractorTick(positionData, t)
 
-  // gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
   clearPass()
-
-  // gl.blendFunc(gl.ONE, gl.ONE)
-  particles(thomasAttractor, innerWidth, innerHeight, t, controls)
+  particles(positionData, innerWidth, innerHeight, t, controls)
 
   requestAnimationFrame(play)
 }
