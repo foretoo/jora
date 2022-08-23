@@ -9,34 +9,58 @@ export function OrbitControls(
   a1 = -0.8,
   a2 = 1,
   k = 100,
-  p: PointData | null = null
+  p: PointData | null = null,
 ) {
   const out = { a1, a2, k }
 
-  const listen = (type: MouseEventType, fn: (e: MouseEvent | WheelEvent) => void) => canvas.addEventListener(type, fn)
-
-  listen("wheel", (e) => {
+  canvas.addEventListener("wheel", (e) => {
+    e.preventDefault()
     const dir = Math.sign((e as WheelEvent).deltaY)
     out.k *= 1 - dir * 0.1
   })
-  
-  listen("mouseup", () => {
+  canvas.addEventListener("mouseup", (e) => {
+    e.preventDefault()
     p = null
   })
-  
-  listen("mousedown", (e) => {
+  canvas.addEventListener("mousedown", (e) => {
+    e.preventDefault()
     p = {
       x: e.x,
       y: e.y,
       a1: out.a1,
-      a2: out.a2
+      a2: out.a2,
     }
   })
-  
-  listen("mousemove", (e) => {
+  canvas.addEventListener("mousemove", (e) => {
+    e.preventDefault()
     if (p) {
       out.a1 = p.a1 - (e.x - p.x) / 100
       out.a2 = p.a2 - (e.y - p.y) / 100
+    }
+  })
+
+  canvas.addEventListener("touchend", (e) => {
+    e.preventDefault()
+    p = null
+  })
+  canvas.addEventListener("touchcancel", (e) => {
+    e.preventDefault()
+    p = null
+  })
+  canvas.addEventListener("touchstart", (e) => {
+    e.preventDefault()
+    p = {
+      x: e.touches[0].screenX,
+      y: e.touches[0].screenY,
+      a1: out.a1,
+      a2: out.a2,
+    }
+  })
+  canvas.addEventListener("touchmove", (e) => {
+    e.preventDefault()
+    if (p) {
+      out.a1 = p.a1 - (e.touches[0].screenX - p.x) / 100
+      out.a2 = p.a2 - (e.touches[0].screenY - p.y) / 100
     }
   })
 
