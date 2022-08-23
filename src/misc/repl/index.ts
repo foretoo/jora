@@ -26,17 +26,31 @@ const orbit = OrbitControls()
 const gui = new dat.GUI()
 const attractor = {
   attractor: "thomas",
-  list: [ "thomas", "aizawa", "sprott", "halvorsen" ],
+  list: [ "thomas", "aizawa", "halvorsen" ],
   current: thomasAttractorTick,
 }
 
 gui
 .add(attractor, "attractor", attractor.list)
-.onChange((curr: "thomas" | "aizawa" | "sprott" | "halvorsen") => {
-  if (curr === attractor.list[0])      attractor.current = thomasAttractorTick
-  else if (curr === attractor.list[1]) attractor.current = aizawaAttractorTick
-  else if (curr === attractor.list[2]) attractor.current = sprottAttractorTick
-  else if (curr === attractor.list[3]) attractor.current = halvorsenAttractorTick
+.onChange((curr: "thomas" | "aizawa" | "halvorsen") => {
+  if (curr === attractor.list[0]) {
+    attractor.current = thomasAttractorTick
+    orbit.a1 = -0.8
+    orbit.a2 = 1
+    orbit.k = 100
+  }
+  else if (curr === attractor.list[1]) {
+    attractor.current = aizawaAttractorTick
+    orbit.a1 = 0
+    orbit.a2 = 0 // 1.5
+    orbit.k = 271
+  }
+  else if (curr === attractor.list[2]) {
+    attractor.current = halvorsenAttractorTick
+    orbit.a1 = -0.7
+    orbit.a2 = -0.7
+    orbit.k = 80
+  }
 })
 
 
