@@ -3,6 +3,9 @@ import { OrbitControls } from "./orbitControls"
 import { aizawaAttractorTick, halvorsenAttractorTick, sprottAttractorTick, thomasAttractorTick } from "./attractors"
 import { fArray } from "./utils"
 import { createPlayer } from "./createPlayer"
+import * as dat from "dat.gui"
+
+
 
 const canvas = document.querySelector("canvas")!
 const pr = Math.min(devicePixelRatio, 2)
@@ -20,9 +23,27 @@ const controls = OrbitControls()
 
 
 
+const gui = new dat.GUI()
+const attractor = {
+  attractor: "thomas",
+  list: [ "thomas", "aizawa", "sprott", "halvorsen" ],
+  current: thomasAttractorTick,
+}
+
+gui
+.add(attractor, "attractor", attractor.list)
+.onChange((curr: "thomas" | "aizawa" | "sprott" | "halvorsen") => {
+  if (curr === attractor.list[0])      attractor.current = thomasAttractorTick
+  else if (curr === attractor.list[1]) attractor.current = aizawaAttractorTick
+  else if (curr === attractor.list[2]) attractor.current = sprottAttractorTick
+  else if (curr === attractor.list[3]) attractor.current = halvorsenAttractorTick
+})
+
+
+
 export const play = createPlayer((t: number) => {
   gl.clear(gl.COLOR_BUFFER_BIT)
 
-  thomasAttractorTick(positionData, t)
+  attractor.current(positionData, t)
   particles(positionData, innerWidth, innerHeight, t, controls)
 })
