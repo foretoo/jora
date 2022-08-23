@@ -2,15 +2,24 @@ import { defineConfig } from "vite"
 import glsl from "vite-plugin-glsl"
 
 export default defineConfig({
+  publicDir: false,
   plugins: [glsl()],
   server: {
-    open: true,
-    host: true
+    open: "/src/index.html",
+    host: true,
   },
   optimizeDeps: {
     entries: "./src/index.ts"
   },
   build: {
-    target: "esnext",
+    assetsDir: ".",
+    rollupOptions: {
+      input: "/src/index.ts",
+      output: {
+        dir: "dist",
+        assetFileNames: "style.css",
+        entryFileNames: "bundle.js",
+      },
+    },
   },
 })
