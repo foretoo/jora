@@ -18,8 +18,8 @@ gl.clearColor(1.0, 1.0, 1.0, 1.0)
 
 
 const positionData = fArray(100000, () => Math.random() * 6 - 3)
-const particles = createPSProgram(gl, positionData)
-const controls = OrbitControls()
+const particles = createPSProgram(gl)
+const orbit = OrbitControls()
 
 
 
@@ -45,5 +45,5 @@ export const play = createPlayer((t: number) => {
   gl.clear(gl.COLOR_BUFFER_BIT)
 
   attractor.current(positionData, t)
-  particles(positionData, innerWidth, innerHeight, t, controls)
+  particles(positionData, innerWidth, innerHeight, t, orbit)
 })

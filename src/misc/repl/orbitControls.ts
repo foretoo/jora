@@ -2,7 +2,7 @@ type MouseEventType = "wheel" | "mouseup" | "mousedown" | "mousemove"
 
 type PointData = { x: number, y: number, a1: number, a2: number }
 
-export type Controls = { a1: number, a2: number, k: number }
+export type Orbit = { a1: number, a2: number, k: number }
 
 export function OrbitControls(
   a1 = Math.random() * 4 - 2,

@@ -1,8 +1,7 @@
-import { Controls } from "."
+import { Orbit } from "./orbitControls"
 
 export const createPSProgram = (
   gl: WebGLRenderingContext,
-  thomasPoints: Float32Array,
 ) => {
   const programId = gl.createProgram()!
 
@@ -68,7 +67,7 @@ export const createPSProgram = (
     width: number,
     height: number,
     time: number,
-    controls: Controls,
+    orbit: Orbit,
   ) => {
     gl.useProgram(programId)
 
@@ -78,9 +77,9 @@ export const createPSProgram = (
 
     gl.uniform2f(resolutionLoc, width, height)
     gl.uniform1f(timeLoc, time)
-    gl.uniform1f(a1Loc, controls.a1)
-    gl.uniform1f(a2Loc, controls.a2)
-    gl.uniform1f(kLoc, controls.k)
+    gl.uniform1f(a1Loc, orbit.a1)
+    gl.uniform1f(a2Loc, orbit.a2)
+    gl.uniform1f(kLoc, orbit.k)
 
     gl.drawArrays(gl.POINTS, 0, thomasPoints.length / 3)
   }
