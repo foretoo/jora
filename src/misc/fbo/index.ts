@@ -5,6 +5,7 @@ import { camera, orbit, renderer, scene } from "./init"
 import vertexShader from "./shaders/vertex.glsl"
 import fragmentShader from "./shaders/fragment.glsl"
 import { getGPGPU } from "./gpgpu"
+import { createPlayer } from "./createPlayer"
 
 
 
@@ -41,9 +42,8 @@ const plane = new Points(geometry, material)
 scene.add(plane)
 
 
-export const play = () => {
+export const play = createPlayer(() => {
   material.uniforms.positionTexture.value = computePositionTexture()
   orbit.update()
   renderer.render(scene, camera)
-  requestAnimationFrame(play)
-}
+})
