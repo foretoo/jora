@@ -24,6 +24,7 @@ const material = new ShaderMaterial({
   },
   vertexShader,
   fragmentShader,
+  transparent: true,
 })
 
 const geometry = new BufferGeometry()

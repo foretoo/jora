@@ -21,8 +21,8 @@ export const getGPGPU = (
   const posVar = gpuCompute.addVariable("positionTexture", computeShader, positionTexture)
 
   posVar.material.uniforms.time =  { value: 0 }
-  posVar.material.uniforms.vel = { value: 0.02 }
-  posVar.material.uniforms.roughness = { value: 0.2 }
+  posVar.material.uniforms.vel = { value: 0.03 }
+  posVar.material.uniforms.roughness = { value: 0.5 }
   posVar.wrapS = RepeatWrapping
   posVar.wrapT = RepeatWrapping
 
