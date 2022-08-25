@@ -1,22 +1,10 @@
 import { scene, camera } from "../../init"
 import * as dat from "dat.gui"
 import { igloo, indices } from "./igloo"
-
-import { Group } from "three/src/objects/Group"
-import { Mesh } from "three/src/objects/Mesh"
-import { MeshStandardMaterial } from "three/src/materials/MeshStandardMaterial"
-import { Vector3 } from "three/src/math/Vector3"
-import { PlaneBufferGeometry } from "three/src/geometries/PlaneGeometry"
-import { AmbientLight } from "three/src/lights/AmbientLight"
-import { DirectionalLight } from "three/src/lights/DirectionalLight"
-import { DirectionalLightHelper } from "three/src/helpers/DirectionalLightHelper"
-import { GridHelper } from "three/src/helpers/GridHelper"
-import { DoubleSide } from "three/src/constants"
-import { CapsuleBufferGeometry } from "three"
+import { AmbientLight, CapsuleBufferGeometry, DirectionalLight, DirectionalLightHelper, DoubleSide, GridHelper, Group, Mesh, MeshStandardMaterial, PlaneBufferGeometry, Vector3 } from "three"
 
 const gui = new dat.GUI()
-camera.position.y = 3
-camera.position.z = 5
+camera.position.set(0, 3, 5)
 
 
 
@@ -82,8 +70,9 @@ scene.add(moonLight, directHelper)
 
 
 
-// const grid = new GridHelper(100, 100, 0x444444, 0x222222)
-// scene.add(grid)
+const grid = new GridHelper(100, 100, 0x444444, 0x222222)
+scene.add(grid)
 
 const play = () => {}
+
 export { play }
