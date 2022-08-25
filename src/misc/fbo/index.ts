@@ -1,18 +1,17 @@
-import { BufferAttribute, BufferGeometry, Points, RepeatWrapping, ShaderMaterial } from "three"
-import { GPUComputationRenderer } from "three/examples/jsm/misc/GPUComputationRenderer"
+import { BufferAttribute, BufferGeometry, Points, ShaderMaterial } from "three"
 import { camera, orbit, renderer, scene } from "./init"
+import { createPlayer } from "./createPlayer"
 
 import vertexShader from "./shaders/vertex.glsl"
 import fragmentShader from "./shaders/fragment.glsl"
 import { getGPGPU } from "./gpgpu"
-import { createPlayer } from "./createPlayer"
 
 
 
 camera.position.set(0, 0, -10)
 
-const width  = 512
-const height = 512
+const width  = 256
+const height = 256
 
 const computePositionTexture = getGPGPU(width, height, renderer)
 
