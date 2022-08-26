@@ -58,11 +58,11 @@ scene.add(floor)
  * LIGHTS
  */
 
-const ambientLight = new AmbientLight(0xffffff, 0.5)
+const ambientLight = new AmbientLight(0xffffff, 0.618)
 gui.add(ambientLight, "intensity").min(0).max(1).step(0.001)
 scene.add(ambientLight)
 
-const moonLight = new DirectionalLight("#f70", 0.5)
+const moonLight = new DirectionalLight("#f70", 0.618)
 moonLight.position.set(4, 5, -2)
 const directHelper = new DirectionalLightHelper(moonLight, 0.2)
 setTimeout(() => directHelper.update(), 0)
