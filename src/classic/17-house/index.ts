@@ -1,7 +1,7 @@
 import { scene, camera } from "../../init"
 import * as dat from "dat.gui"
 import { igloo, indices } from "./igloo"
-import { AmbientLight, CapsuleBufferGeometry, DirectionalLight, DirectionalLightHelper, DoubleSide, GridHelper, Group, Mesh, MeshStandardMaterial, PlaneBufferGeometry, Vector3 } from "three"
+import { AmbientLight, CapsuleBufferGeometry, DirectionalLight, DirectionalLightHelper, DoubleSide, Euler, GridHelper, Group, InstancedMesh, Mesh, MeshStandardMaterial, Object3D, PlaneBufferGeometry, Quaternion, Vector3 } from "three"
 import { getSnowFellas } from "./snowfellas"
 
 const gui = new dat.GUI()
@@ -22,6 +22,7 @@ scene.add(snowball)
 const house = new Group()
 scene.add(house)
 
+const plane = new PlaneBufferGeometry()
 
 
 //// WALLS
@@ -38,16 +39,20 @@ house.add(walls)
 //// STICKS
 const indiestick = new CapsuleBufferGeometry(0.04, 0.1, 3, 8)
 const indiematerial = new MeshStandardMaterial({ color: "#7c5e52" })
+const sticks = new InstancedMesh(indiestick, indiematerial, indices.length)
+const stickGismo = new Object3D()
 const axisY = new Vector3(0, 1, 0)
-// indiematerial.flatShading = true
-indices.forEach(([ x, y, z ]) => {
-  const stick = new Mesh(indiestick, indiematerial)
-  stick.position.set(x, y, z)
-  stick.position.multiplyScalar(1.02)
-  stick.quaternion.setFromUnitVectors(axisY, stick.position.clone().normalize())
-  house.add(stick)
-})
+const unitQ = new Quaternion()
 
+indices.forEach(([ x, y, z ], i) => {
+  stickGismo.position.set(x, y ? y : 0.05, z)
+  stickGismo.position.multiplyScalar(1.02)
+  stickGismo.quaternion.setFromUnitVectors(axisY, stickGismo.position.clone().normalize())
+  if (!y) stickGismo.quaternion.rotateTowards(unitQ, Math.PI / 4)
+  stickGismo.updateMatrix()
+  sticks.setMatrixAt(i, stickGismo.matrix)
+})
+house.add(sticks)
 
 
 //// FLOOR

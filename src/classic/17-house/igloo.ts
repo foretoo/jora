@@ -42,9 +42,9 @@ for (let i = 0; i < polycount; i++) {
   uvpoints[j + 3] = uvarray[j + 3]; uvpoints[j + 4] = uvarray[j + 4]; uvpoints[j + 5] = uvarray[j + 5]
   uvpoints[j + 6] = uvarray[j + 6]; uvpoints[j + 7] = uvarray[j + 7]; uvpoints[j + 8] = uvarray[j + 8]
   //// indices
-  posarray[j + 1] && tpoints.push([ posarray[j + 0], posarray[j + 1], posarray[j + 2] ])
-  posarray[j + 4] && tpoints.push([ posarray[j + 3], posarray[j + 4], posarray[j + 5] ])
-  posarray[j + 7] && tpoints.push([ posarray[j + 6], posarray[j + 7], posarray[j + 8] ])
+  tpoints.push([ posarray[j + 0], posarray[j + 1], posarray[j + 2] ])
+  tpoints.push([ posarray[j + 3], posarray[j + 4], posarray[j + 5] ])
+  tpoints.push([ posarray[j + 6], posarray[j + 7], posarray[j + 8] ])
 }
 
 const igloo = new BufferGeometry()
