@@ -2,9 +2,15 @@ import { scene, camera } from "../../init"
 import * as dat from "dat.gui"
 import { igloo, indices } from "./igloo"
 import { AmbientLight, CapsuleBufferGeometry, DirectionalLight, DirectionalLightHelper, DoubleSide, GridHelper, Group, Mesh, MeshStandardMaterial, PlaneBufferGeometry, Vector3 } from "three"
+import { getSnowFellas } from "./snowfellas"
 
 const gui = new dat.GUI()
 camera.position.set(0, 3, 5)
+
+
+const count = 50
+const snowball = getSnowFellas(0.1, count)
+scene.add(snowball)
 
 
 
