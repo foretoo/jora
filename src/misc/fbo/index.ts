@@ -1,6 +1,5 @@
 import { BufferAttribute, BufferGeometry, Points, ShaderMaterial } from "three"
 import { camera, orbit, renderer, scene } from "./init"
-import { createPlayer } from "./createPlayer"
 
 import vertexShader from "./shaders/vertex.glsl"
 import fragmentShader from "./shaders/fragment.glsl"
@@ -41,8 +40,9 @@ const plane = new Points(geometry, material)
 scene.add(plane)
 
 
-export const play = createPlayer(() => {
+export const play = () => {
   material.uniforms.positionTexture.value = computePositionTexture()
   orbit.update()
   renderer.render(scene, camera)
-})
+  requestAnimationFrame(play)
+}
