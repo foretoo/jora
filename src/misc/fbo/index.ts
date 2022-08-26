@@ -1,12 +1,14 @@
 import { BufferAttribute, BufferGeometry, Points, ShaderMaterial } from "three"
 import { camera, orbit, renderer, scene } from "./init"
+import { getGPGPU } from "./gpgpu"
+import { initGUI } from "./gui"
 
 import vertexShader from "./shaders/vertex.glsl"
 import fragmentShader from "./shaders/fragment.glsl"
-import { getGPGPU } from "./gpgpu"
 
 
 
+initGUI()
 camera.position.set(0, 0, -10)
 
 const width  = 256
