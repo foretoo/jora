@@ -77,6 +77,7 @@ scene.add(moonLight, directHelper)
 
 
 const grid = new GridHelper(100, 100, 0x444444, 0x222222)
+grid.position.y = 0.001
 scene.add(grid)
 
 const play = () => {}

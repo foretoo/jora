@@ -14,7 +14,7 @@ export const getSnowFellas = (
 
   for (let i = 0; i < count; i++) {
     const angle = gRandom(-Math.PI, Math.PI * 3)
-    const distance = 1.5 + (radius * 10) + Math.random() * (3.5 - (radius * 10))
+    const distance = 1.5 + (radius * 5) + Math.random() * (3.5 - (radius * 5))
     gizmo.position.set(
       Math.sin(angle) * distance,
       0,
