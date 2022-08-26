@@ -1,12 +1,12 @@
 uniform float vel;
 uniform float roughness;
 
-uniform float a;
-uniform float b;
-uniform float c;
-uniform float d;
-uniform float e;
-uniform float f;
+uniform float aa;
+uniform float ab;
+uniform float ac;
+uniform float ad;
+uniform float ae;
+uniform float af;
 
 uniform sampler2D positionTexture;
 
@@ -34,9 +34,9 @@ void main() {
   float v = vel / 100.0;
 
   vec3 next = vec3(
-    x + v * ((z - b) * x - d * y) + rgh(prev.xy),
-    y + v * (d * x + (z - b) * y) + rgh(prev.yz),
-    z + v * (c + a * z - z * z * z / 3.0 - (x * x + y * y) * (1.0 + e * z) + f * z * x * x * x) + rgh(prev.zx)
+    x + v * ((z - ab) * x - ad * y) + rgh(prev.xy),
+    y + v * (ad * x + (z - ab) * y) + rgh(prev.yz),
+    z + v * (ac + aa * z - z * z * z / 3.0 - (x * x + y * y) * (1.0 + ae * z) + af * z * x * x * x) + rgh(prev.zx)
   );
 
   gl_FragColor = vec4(next, 1.0);

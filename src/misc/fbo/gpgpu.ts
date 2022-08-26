@@ -9,18 +9,24 @@ let positionVar: Variable
 
 const gui = new dat.GUI()
 const attractor = {
-  attractor: "thomas",
+  attractor: "aizawa",
   list: [ "thomas", "aizawa" ],
   
   roughness: 0.0,
   vel: 2.0,
 
-  a: 1.0,
-  b: 0.5,
-  c: 1.5,
-  d: 0.0,
-  e: 0.2,
-  skew: 0.0,
+  thomas: {
+    b: 0.208186,
+  },
+
+  aizawa: {
+    a: 1.0,
+    b: 0.5,
+    c: 1.5,
+    d: 0.0,
+    e: 0.2,
+    skew: 0.0,
+  }
 }
 
 gui.add(attractor, "attractor", attractor.list)
@@ -28,10 +34,14 @@ gui.add(attractor, "attractor", attractor.list)
   if (curr === attractor.list[0]) {
     positionVar.material.fragmentShader = thomasShader
     positionVar.material.needsUpdate = true
+    aizawaFolder.hide()
+    thomasFolder.show()
   }
   else if (curr === attractor.list[1]) {
     positionVar.material.fragmentShader = aizawaShader
     positionVar.material.needsUpdate = true
+    aizawaFolder.show()
+    thomasFolder.hide()
   }
 })
 
@@ -39,30 +49,47 @@ gui.add(attractor, "roughness", 0, 1, 0.01)
 .onChange((roughness: number) => {
   positionVar.material.uniforms.roughness.value = roughness
 })
+
 gui.add(attractor, "vel", 0, 4, 0.05)
 .onChange((vel: number) => {
   positionVar.material.uniforms.vel.value = vel
 })
 
-gui.add(attractor, "a", -4, 4, 0.05)
+const thomasFolder = gui.addFolder("thomas props")
+thomasFolder.open()
+thomasFolder.hide()
+
+thomasFolder.add(attractor.thomas, "b", 0.1, 0.3, 0.01)
 .onChange((value: number) => {
-  positionVar.material.uniforms.a.value = value
+  positionVar.material.uniforms.tb.value = value
 })
-gui.add(attractor, "b", -4, 4, 0.05)
+
+const aizawaFolder = gui.addFolder("aizawa props")
+aizawaFolder.open()
+
+aizawaFolder.add(attractor.aizawa, "a", -4, 4, 0.05)
 .onChange((value: number) => {
-  positionVar.material.uniforms.b.value = value
+  positionVar.material.uniforms.aa.value = value
 })
-gui.add(attractor, "c", -4, 4, 0.05)
+
+aizawaFolder.add(attractor.aizawa, "b", -4, 4, 0.05)
 .onChange((value: number) => {
-  positionVar.material.uniforms.c.value = value
+  positionVar.material.uniforms.ab.value = value
 })
-gui.add(attractor, "e", 0, 1, 0.05)
+
+aizawaFolder.add(attractor.aizawa, "c", -4, 4, 0.05)
 .onChange((value: number) => {
-  positionVar.material.uniforms.e.value = value
+  positionVar.material.uniforms.ac.value = value
 })
-gui.add(attractor, "skew", -0.5, 0.5, 0.01)
+
+aizawaFolder.add(attractor.aizawa, "e", 0, 1, 0.05)
 .onChange((value: number) => {
-  positionVar.material.uniforms.f.value = value
+  positionVar.material.uniforms.ae.value = value
+})
+
+aizawaFolder.add(attractor.aizawa, "skew", -0.5, 0.5, 0.01)
+.onChange((value: number) => {
+  positionVar.material.uniforms.af.value = value
 })
 
 export const getGPGPU = (
@@ -82,17 +109,18 @@ export const getGPGPU = (
 
   const positionTexture = gpuCompute.createTexture()
   positionTexture.image.data.set(data)
-  positionVar = gpuCompute.addVariable("positionTexture", thomasShader, positionTexture)
+  positionVar = gpuCompute.addVariable("positionTexture", aizawaShader, positionTexture)
 
   positionVar.material.uniforms.vel = { value: attractor.vel }
   positionVar.material.uniforms.roughness = { value: attractor.roughness }
 
-  positionVar.material.uniforms.a = { value: attractor.a }
-  positionVar.material.uniforms.b = { value: attractor.b }
-  positionVar.material.uniforms.c = { value: attractor.c }
-  positionVar.material.uniforms.d = { value: attractor.d }
-  positionVar.material.uniforms.e = { value: attractor.e }
-  positionVar.material.uniforms.f = { value: attractor.skew }
+  positionVar.material.uniforms.tb = { value: attractor.thomas.b }
+  positionVar.material.uniforms.aa = { value: attractor.aizawa.a }
+  positionVar.material.uniforms.ab = { value: attractor.aizawa.b }
+  positionVar.material.uniforms.ac = { value: attractor.aizawa.c }
+  positionVar.material.uniforms.ad = { value: attractor.aizawa.d }
+  positionVar.material.uniforms.ae = { value: attractor.aizawa.e }
+  positionVar.material.uniforms.af = { value: attractor.aizawa.skew }
 
   positionVar.wrapS = RepeatWrapping
   positionVar.wrapT = RepeatWrapping
