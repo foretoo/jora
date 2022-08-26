@@ -11,9 +11,8 @@ export const scene = new Scene()
 scene.background = new Color("#fff")
 
 // Camera
-export const camera = new PerspectiveCamera(75, innerWidth / innerHeight, 0.1, 100)
-camera.position.set(0, 1, 2)
-scene.add(camera)
+export const camera = new PerspectiveCamera(45, innerWidth / innerHeight, 0.1, 100)
+camera.position.set(0, 0, 2)
 
 // Orbit
 export const orbit = new TrackballControls(camera, canvas)
