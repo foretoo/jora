@@ -23,11 +23,11 @@ export const controls = {
     positionVar.material.needsUpdate = true
   },
 
-  _noiseFactor: 0.1,
-  get noiseFactor() { return controls._noiseFactor },
-  set noiseFactor(v) {
-    controls._noiseFactor = v
-    material.uniforms.noiseFactor.value = v
+  _noiseStrength: 0.1,
+  get noiseStrength() { return controls._noiseStrength },
+  set noiseStrength(v) {
+    controls._noiseStrength = v
+    material.uniforms.noiseStrength.value = v
   },
   
   _roughness: 0.0,

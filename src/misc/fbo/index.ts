@@ -22,7 +22,7 @@ const computePositionTexture = getGPGPU(width, height, renderer)
 export const material = new ShaderMaterial({
   uniforms: {
     time: { value: 0 },
-    noiseFactor: { value: controls.noiseFactor },
+    noiseStrength: { value: controls.noiseStrength },
     positionTexture: { value: null },
   },
   vertexShader,
