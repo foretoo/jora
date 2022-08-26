@@ -17,9 +17,10 @@ export const initGUI = () => {
     }
   })
 
+  gui.add(controls, "noiseStrength", 0, 1, 0.01)
+  gui.add(controls, "noiseScale", 0.5, 2, 0.01)
   gui.add(controls, "roughness", 0, 1, 0.01)
   gui.add(controls, "vel", 0, 4, 0.05)
-  gui.add(controls, "noiseStrength", 0, 1, 0.05)
 
   const thomasFolder = gui.addFolder("thomas props")
   thomasFolder.open()
