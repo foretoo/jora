@@ -1,3 +1,4 @@
+import { material } from "."
 import { positionVar } from "./gpgpu"
 import aizawaShader from "./shaders/aizawa.glsl"
 import thomasShader from "./shaders/thomas.glsl"
@@ -20,6 +21,13 @@ export const controls = {
       positionVar.material.fragmentShader = thomasShader
     }
     positionVar.material.needsUpdate = true
+  },
+
+  _noiseFactor: 0.1,
+  get noiseFactor() { return controls._noiseFactor },
+  set noiseFactor(v) {
+    controls._noiseFactor = v
+    material.uniforms.noiseFactor.value = v
   },
   
   _roughness: 0.0,

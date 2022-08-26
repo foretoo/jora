@@ -5,6 +5,7 @@ import { initGUI } from "./gui"
 
 import vertexShader from "./shaders/vertex.glsl"
 import fragmentShader from "./shaders/fragment.glsl"
+import { controls } from "./controls"
 
 
 
@@ -18,10 +19,10 @@ const computePositionTexture = getGPGPU(width, height, renderer)
 
 
 
-const material = new ShaderMaterial({
+export const material = new ShaderMaterial({
   uniforms: {
     time: { value: 0 },
-    noiseFactor: { value: 0.1 },
+    noiseFactor: { value: controls.noiseFactor },
     positionTexture: { value: null },
   },
   vertexShader,
