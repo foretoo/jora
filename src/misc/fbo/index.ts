@@ -21,6 +21,7 @@ const computePositionTexture = getGPGPU(width, height, renderer)
 const material = new ShaderMaterial({
   uniforms: {
     time: { value: 0 },
+    noiseFactor: { value: 0.1 },
     positionTexture: { value: null },
   },
   vertexShader,
@@ -43,6 +44,7 @@ scene.add(plane)
 
 
 export const play = () => {
+  material.uniforms.time.value += 0.01
   material.uniforms.positionTexture.value = computePositionTexture()
   orbit.update()
   renderer.render(scene, camera)
