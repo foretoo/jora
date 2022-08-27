@@ -6,7 +6,7 @@ import { getSnowFellas } from "./snowfellas"
 import { getRTTData } from "./rtt"
 
 const gui = new dat.GUI()
-camera.position.set(0, 8, 5)
+camera.position.set(2, 5, 8)
 
 const { texture: noiseTexture, buffer: noiseBuffer } = getRTTData(renderer)
 const fellas = getSnowFellas(0.1, noiseBuffer)
@@ -26,7 +26,7 @@ scene.add(house)
 //// WALLS
 const walls = new Mesh(
   igloo,
-  new MeshStandardMaterial({ color: "#ac8e82" })
+  new MeshStandardMaterial({ color: "#7fb" })
 )
 walls.material.side = DoubleSide
 walls.material.flatShading = true
@@ -36,7 +36,7 @@ house.add(walls)
 
 //// STICKS
 const indiestick = new CapsuleBufferGeometry(0.04, 0.2, 3, 8)
-const indiematerial = new MeshStandardMaterial({ color: "#7c5e52" })
+const indiematerial = new MeshStandardMaterial({ color: "#135" })
 const sticks = new InstancedMesh(indiestick, indiematerial, indices.length)
 const stickGismo = new Object3D()
 const axisY = new Vector3(0, 1, 0)
@@ -71,10 +71,10 @@ scene.add(floor)
  * LIGHTS
  */
 
-const ambientLight = new AmbientLight(0xffffff, 0.618)
+const ambientLight = new AmbientLight(0xffffff, 0.75)
 scene.add(ambientLight)
 
-const moonLight = new DirectionalLight("#f70", 0.618)
+const moonLight = new DirectionalLight("#f70", 0.75)
 moonLight.position.set(4, 5, -2)
 const directHelper = new DirectionalLightHelper(moonLight, 0.2)
 setTimeout(() => directHelper.update(), 0)
