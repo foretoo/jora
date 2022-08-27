@@ -26,6 +26,7 @@
   "dependencies": {
     "dat.gui": "^0.7.9",
     "gsap": "^3.10.4",
+    "poisson-disk-sampling": "^2.3.1",
     "simplex-noise": "^4.0.0",
     "three": "^0.142.0"
   }
