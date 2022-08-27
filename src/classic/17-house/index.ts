@@ -1,16 +1,16 @@
 import { scene, camera, renderer } from "../../init"
 import * as dat from "dat.gui"
 import { igloo, indices } from "./igloo"
-import { AmbientLight, CapsuleBufferGeometry, DirectionalLight, DirectionalLightHelper, DoubleSide, Euler, GridHelper, Group, InstancedMesh, Mesh, MeshStandardMaterial, Object3D, PlaneBufferGeometry, Quaternion, Vector3 } from "three"
+import { AmbientLight, CapsuleBufferGeometry, DirectionalLight, DirectionalLightHelper, DoubleSide, GridHelper, Group, InstancedMesh, Mesh, MeshStandardMaterial, Object3D, PlaneBufferGeometry, Quaternion, Vector3 } from "three"
 import { getSnowFellas } from "./snowfellas"
-import { getTexture } from "./rtt"
+import { getRTTData } from "./rtt"
 
 const gui = new dat.GUI()
 camera.position.set(0, 8, 5)
 
-
+const { texture: noiseTexture, buffer: noiseBuffer } = getRTTData(renderer)
 const count = 50
-const snowball = getSnowFellas(0.1, count)
+const snowball = getSnowFellas(0.1, count, noiseBuffer)
 scene.add(snowball)
 
 
@@ -55,12 +55,12 @@ house.add(sticks)
 
 
 //// FLOOR
-const planeTexture = getTexture(renderer)
+
 const floor = new Mesh(
   new PlaneBufferGeometry(10, 10),
   new MeshStandardMaterial({
     color: "#adf",
-    map: planeTexture,
+    map: noiseTexture,
   }),
 )
 floor.rotation.x = -Math.PI / 2
