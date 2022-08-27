@@ -23,18 +23,25 @@ scene.add(
         #include snoise2D;
 
         void main() {
-          float noise = snoise2D(vUv * 2.0 + ${Math.random() * 10}) * 0.5 + 0.5;
+          float noise = snoise2D(vUv * 3.0 + ${Math.random() * 10}) * 0.5 + 0.5;
           noise *= noise * noise;
-          float center = abs(sin(vUv.y * PI)) * abs(sin(vUv.x * PI)) * 0.96;
-          float color = 1.0 - center - noise;
-          gl_FragColor = vec4(vec3(color), 1.0);
+          float center = abs(sin(vUv.y * PI)) * abs(sin(vUv.x * PI));
+          center *= center;
+          float bottom = cos(vUv.y * PI * 0.5 + PI * 0.333);
+
+          float value = 1.0 - center * 2.0 - bottom * 1.2 - noise * 1.6;
+
+          float red = smoothstep(0.0, 1.0, 1.0 - value);
+          float green = 0.5 - 0.25 * value * red;
+          float blue = 0.8;
+          gl_FragColor = vec4(red, green, blue, value);
         }`
         .replace("#include snoise2D;", snoise2D),
     })
   )
 )
 
-const size = 64
+const size = 256
 
 const offscreen = new WebGLRenderTarget(size, size, {
   magFilter: NearestFilter,
