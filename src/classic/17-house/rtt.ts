@@ -34,9 +34,9 @@ scene.add(
   )
 )
 
-const w = 256
+const size = 64
 
-const texture = new WebGLRenderTarget(w, w, {
+const offscreen = new WebGLRenderTarget(size, size, {
   magFilter: NearestFilter,
   minFilter: NearestFilter,
   depthBuffer: false,
@@ -44,11 +44,16 @@ const texture = new WebGLRenderTarget(w, w, {
 
 
 
-export const getTexture = (
+export const getRTTData = (
   renderer: WebGLRenderer
 ) => {
-  renderer.setRenderTarget(texture)
+  renderer.setRenderTarget(offscreen)
   renderer.render(scene, camera)
   renderer.setRenderTarget(null)
-  return texture.texture
+
+  const buffer = new Uint8Array(size * size * 4)
+  renderer.readRenderTargetPixels(offscreen, 0, 0, size, size, buffer)
+  const texture = offscreen.texture
+  
+  return { texture, buffer }
 }
