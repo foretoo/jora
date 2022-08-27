@@ -23,9 +23,9 @@ scene.add(
         #include snoise2D;
 
         void main() {
-          float noise = snoise2D(vUv * 2.0) * 0.5 + 0.5;
-          noise *= noise;
-          float center = abs(sin(vUv.y * PI)) * abs(sin(vUv.x * PI));
+          float noise = snoise2D(vUv * 2.0 + ${Math.random() * 10}) * 0.5 + 0.5;
+          noise *= noise * noise;
+          float center = abs(sin(vUv.y * PI)) * abs(sin(vUv.x * PI)) * 0.96;
           float color = 1.0 - center - noise;
           gl_FragColor = vec4(vec3(color), 1.0);
         }`
