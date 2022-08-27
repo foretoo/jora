@@ -9,9 +9,8 @@ const gui = new dat.GUI()
 camera.position.set(0, 8, 5)
 
 const { texture: noiseTexture, buffer: noiseBuffer } = getRTTData(renderer)
-const count = 50
-const snowball = getSnowFellas(0.1, count, noiseBuffer)
-scene.add(snowball)
+const fellas = getSnowFellas(0.1, noiseBuffer)
+scene.add(fellas)
 
 
 
