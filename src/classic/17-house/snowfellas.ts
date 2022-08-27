@@ -1,4 +1,4 @@
-import { DoubleSide, InstancedMesh, MeshStandardMaterial, Object3D, SphereBufferGeometry } from "three"
+import { Color, ConeGeometry, CylinderBufferGeometry, DoubleSide, InstancedMesh, MeshStandardMaterial, Object3D, SphereBufferGeometry } from "three"
 import PoissonDiskSampling from "poisson-disk-sampling"
 
 
@@ -18,7 +18,7 @@ export const getSnowFellas = (
     _x = Math.floor(x),
     _y = Math.floor(y),
     i = (_y * size + _x) * 4
-    return noiseData[i] / 255
+    return noiseData[i + 3] / 255
   }
 
   let tryNum = 20
@@ -27,12 +27,12 @@ export const getSnowFellas = (
       tryNum--
       const points: [number, number][] = new PoissonDiskSampling({
         shape: [ size, size ],
-        minDistance: 6,
-        maxDistance: 66,
-        tries: 20,
+        minDistance: 16,
+        maxDistance: 104,
+        tries: 40,
         distanceFunction: (p: [ number, number ]) => {
           const v = getValue(p[0], p[1])
-          return v > 0.2 ? 0 : 1
+          return v > 0.4 ? 0 : 1 - v
         },
       }).fill()
       if (points?.length < 50) throw undefined
@@ -46,25 +46,23 @@ export const getSnowFellas = (
   const points = getPoints()
   const count = points?.length || 0
 
-  const geometry = new SphereBufferGeometry(radius, 18, 6, 0, Math.PI * 2, 0, Math.PI / 2)
+  const geometry = new SphereBufferGeometry(radius, 18, 6, 0, Math.PI * 2, 0, Math.PI / 2) // new ConeGeometry(radius, radius * 2, 12, 1, true) // new CylinderBufferGeometry(radius / 2, radius, radius * 2, 12, 1)
   const material = new MeshStandardMaterial({ color: "#fff", side: DoubleSide })
   const mesh = new InstancedMesh(geometry, material, count)
 
   const gizmo = new Object3D()
 
   for (let i = 0; i < count; i++) {
+
     const px = points![i][0]
     const py = points![i][1]
     const ox = px / size * 10 - 5
     const oy = 5 - py / size * 10
-    gizmo.position.set(
-      Math.abs(ox) > 4.5 ? 4.5 * Math.sign(ox) : ox,
-      0,
-      Math.abs(oy) > 4.5 ? 4.5 * Math.sign(oy) : oy,
-    )
-    const v = getValue(px, py)
-    const scaleH = 1 + v * Math.random() * 5
-    const scaleV = v * scaleH * 5
+    gizmo.position.set(ox, 0, oy)
+
+    const v = Math.max(getValue(px, py), 0.25)
+    const scaleH = 1 + v * Math.random() * 9
+    const scaleV = v * scaleH * 3
     gizmo.scale.set(scaleH, scaleV, scaleH)
   
     gizmo.updateMatrix()
