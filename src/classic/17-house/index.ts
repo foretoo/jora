@@ -1,7 +1,7 @@
-import { scene, camera, renderer } from "../../init"
+import { scene, camera, renderer, orbit } from "../../init"
 import * as dat from "dat.gui"
 import { igloo, indices } from "./igloo"
-import { AmbientLight, CameraHelper, CapsuleBufferGeometry, DirectionalLight, DirectionalLightHelper, DoubleSide, GridHelper, Group, InstancedMesh, Mesh, MeshStandardMaterial, Object3D, PCFSoftShadowMap, PlaneBufferGeometry, Quaternion, Vector2, Vector3 } from "three"
+import { AmbientLight, CameraHelper, CapsuleBufferGeometry, Color, DirectionalLight, DirectionalLightHelper, DoubleSide, Fog, GridHelper, Group, InstancedMesh, Mesh, MeshStandardMaterial, Object3D, PCFSoftShadowMap, PlaneBufferGeometry, PointLight, Quaternion, Vector2, Vector3 } from "three"
 import { getSnowFellas } from "./snowfellas"
 import { getRTTData } from "./rtt"
 import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass"
@@ -13,6 +13,10 @@ camera.position.set(2, 5, 8)
 
 renderer.shadowMap.enabled = true
 renderer.shadowMap.type = PCFSoftShadowMap
+
+const fog = new Fog("#7af", 5, 15)
+scene.fog = fog
+// scene.background = new Color("#7af")
 
 
 
@@ -63,8 +67,8 @@ marquee.add(marqueeBells)
  * ENVIRONMENT
  */
 
-const { texture: noiseTexture, buffer: noiseBuffer } = getRTTData(renderer)
-const fellas = getSnowFellas(0.1, noiseBuffer)
+const { texture: noiseTexture, buffer: noiseData } = getRTTData(renderer)
+const fellas = getSnowFellas(0.1, noiseData)
 fellas.material.flatShading = true
 fellas.castShadow = true
 fellas.receiveShadow = true
@@ -117,6 +121,14 @@ scene.add(moonLight, directHelper, directCamera)
 const grid = new GridHelper(100, 100, 0x444444, 0x222222)
 grid.position.y = 0.001
 // scene.add(grid)
+
+
+
+orbit.addEventListener("change", () => {
+  const length = camera.position.length()
+  fog.near = length - 5
+  fog.far = length + 5
+})
 
 
 
