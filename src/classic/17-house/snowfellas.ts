@@ -32,7 +32,7 @@ export const getSnowFellas = (
         tries: 40,
         distanceFunction: (p: [ number, number ]) => {
           const v = getValue(p[0], p[1])
-          return v > 0.4 ? 0 : 1 - v
+          return v > 0.3 ? 0 : 1 - v
         },
       }).fill()
       if (points?.length < 50) throw undefined
@@ -46,7 +46,7 @@ export const getSnowFellas = (
   const points = getPoints()
   const count = points?.length || 0
 
-  const geometry = new SphereBufferGeometry(radius, 4, 1, 0, Math.PI * 2, 0, Math.PI / 2) // new ConeGeometry(radius, radius * 2, 12, 1, true) // new CylinderBufferGeometry(radius / 2, radius, radius * 2, 12, 1)
+  const geometry = new SphereBufferGeometry(radius, 3, 1, 0, Math.PI * 2, 0, Math.PI / 2) // new ConeGeometry(radius, radius * 2, 12, 1, true) // new CylinderBufferGeometry(radius / 2, radius, radius * 2, 12, 1)
   const material = new MeshStandardMaterial({ color: "#fff", side: DoubleSide })
   const mesh = new InstancedMesh(geometry, material, count)
 

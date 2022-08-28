@@ -29,7 +29,7 @@ scene.add(
           center *= center;
           float bottom = cos(vUv.y * PI * 0.5 + PI * 0.333);
 
-          float value = 1.0 - center * 2.0 - bottom * 1.2 - noise * 1.6;
+          float value = 1.0 - center * 2.0 - bottom * 1.0 - noise * 1.6;
 
           float red = smoothstep(0.0, 1.0, 1.0 - value);
           float green = 0.5 - 0.25 * value * red;
