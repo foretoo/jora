@@ -18,6 +18,12 @@ const fog = new Fog("#7af", 5, 15)
 scene.fog = fog
 // scene.background = new Color("#7af")
 
+orbit.addEventListener("change", () => {
+  const length = camera.position.length()
+  fog.near = length - 5
+  fog.far = length + 5
+})
+
 
 
 /**
@@ -67,7 +73,12 @@ marquee.add(marqueeBells)
  * ENVIRONMENT
  */
 
-const { texture: noiseTexture, buffer: noiseData } = getRTTData(renderer)
+const {
+  texture: colorTexture,
+  alpha: alphaTexture,
+  buffer: noiseData
+} = getRTTData(renderer)
+
 const fellas = getSnowFellas(0.1, noiseData)
 fellas.material.flatShading = true
 fellas.castShadow = true
@@ -75,10 +86,12 @@ fellas.receiveShadow = true
 scene.add(fellas)
 
 const floor = new Mesh(
-  new PlaneBufferGeometry(11, 11),
+  new PlaneBufferGeometry(10, 10, 64, 64),
   new MeshStandardMaterial({
     color: "#adf",
-    map: noiseTexture,
+    map: colorTexture,
+    displacementMap: alphaTexture,
+    displacementScale: 0.62,
   }),
 )
 floor.rotation.x = -Math.PI / 2
@@ -91,7 +104,7 @@ scene.add(floor)
  * LIGHTS
  */
 
-const ambientLight = new AmbientLight(0xffffff, 0.5)
+const ambientLight = new AmbientLight(0xffffff, 0.1)
 scene.add(ambientLight)
 
 const moonLight = new DirectionalLight("#fa7", 0.9)
@@ -124,18 +137,10 @@ grid.position.y = 0.001
 
 
 
-orbit.addEventListener("change", () => {
-  const length = camera.position.length()
-  fog.near = length - 5
-  fog.far = length + 5
-})
+const play = () => {}
+
+export { play }
 
 
 
 gui.add(ambientLight, "intensity").min(0).max(1).step(0.001)
-
-
-
-const play = () => {}
-
-export { play }
