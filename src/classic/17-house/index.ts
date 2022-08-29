@@ -1,10 +1,10 @@
 import { scene, camera, renderer, orbit } from "../../init"
 import * as dat from "dat.gui"
-import { AmbientLight, CameraHelper, CapsuleBufferGeometry, Color, DirectionalLight, DirectionalLightHelper, DoubleSide, Fog, GridHelper, Group, InstancedMesh, Mesh, MeshStandardMaterial, Object3D, PCFSoftShadowMap, PlaneBufferGeometry, PointLight, Quaternion, SphereBufferGeometry, Vector2, Vector3 } from "three"
+import { AmbientLight, CameraHelper, DirectionalLight, DirectionalLightHelper, Fog, GridHelper, Mesh, MeshStandardMaterial, PCFSoftShadowMap, PlaneBufferGeometry, Vector2 } from "three"
 import { getRTTData } from "./rtt"
-import { igloo, indices } from "./igloo"
 import { getSnowFellas } from "./snowfellas"
 import { updateFlies } from "./flies"
+import { initIgloo } from "./igloo"
 
 
 
@@ -26,47 +26,8 @@ orbit.addEventListener("change", () => {
 
 
 
-/**
- * MARQUEE
- */
+initIgloo()
 
-//// MARQUEE
-const marquee = new Group()
-scene.add(marquee)
-
-
-//// WALLS
-const marqueeWalls = new Mesh(
-  igloo,
-  new MeshStandardMaterial({ color: "#7fb" })
-)
-marqueeWalls.material.side = DoubleSide
-marqueeWalls.material.flatShading = true
-marqueeWalls.castShadow = true
-marqueeWalls.receiveShadow = true
-marquee.add(marqueeWalls)
-
-
-
-//// BELLS
-const marqueeBellsGeometry = new CapsuleBufferGeometry(0.06, 0.04, 3, 8)
-const marqueeBellsMaterial = new MeshStandardMaterial({ emissive: "#5ff" })
-marqueeBellsMaterial.emissiveIntensity = 1
-const marqueeBells = new InstancedMesh(marqueeBellsGeometry, marqueeBellsMaterial, indices.length)
-const marqueeBellsGismo = new Object3D()
-const axisY = new Vector3(0, 1, 0)
-const unitQ = new Quaternion()
-
-indices.forEach(([ x, y, z ], i) => {
-  marqueeBellsGismo.position.set(x, y ? y : 0.01, z)
-  marqueeBellsGismo.position.multiplyScalar(1.02)
-  marqueeBellsGismo.quaternion.setFromUnitVectors(axisY, marqueeBellsGismo.position.clone().normalize())
-  if (!y) marqueeBellsGismo.quaternion.rotateTowards(unitQ, Math.PI * 0.375)
-  marqueeBellsGismo.updateMatrix()
-  marqueeBells.setMatrixAt(i, marqueeBellsGismo.matrix)
-})
-marqueeBells.castShadow = true
-marquee.add(marqueeBells)
 
 
 /**
