@@ -1,13 +1,12 @@
 import { scene, camera, renderer, orbit } from "../../init"
 import * as dat from "dat.gui"
-import { igloo, indices } from "./igloo"
 import { AmbientLight, CameraHelper, CapsuleBufferGeometry, Color, DirectionalLight, DirectionalLightHelper, DoubleSide, Fog, GridHelper, Group, InstancedMesh, Mesh, MeshStandardMaterial, Object3D, PCFSoftShadowMap, PlaneBufferGeometry, PointLight, Quaternion, SphereBufferGeometry, Vector2, Vector3 } from "three"
-import { getSnowFellas } from "./snowfellas"
 import { getRTTData } from "./rtt"
-import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass"
-import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass"
-import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer"
-import { createNoise2D } from "simplex-noise"
+import { igloo, indices } from "./igloo"
+import { getSnowFellas } from "./snowfellas"
+import { updateFlies } from "./flies"
+
+
 
 const gui = new dat.GUI()
 camera.position.set(2, 5, 8)
@@ -15,7 +14,7 @@ camera.position.set(2, 5, 8)
 renderer.shadowMap.enabled = true
 renderer.shadowMap.type = PCFSoftShadowMap
 
-const fog = new Fog("#7af", 5, 15)
+const fog = new Fog("#fa7", 5, 15)
 scene.fog = fog
 // scene.background = new Color("#7af")
 
@@ -132,53 +131,6 @@ scene.add(moonLight, directHelper, directCamera)
 
 
 
-const flynum = 4
-const flyGeometry = new SphereBufferGeometry(0.03, 6, 4)
-const flyMaterial = new MeshStandardMaterial({ emissive: "#5ff", emissiveIntensity: 1 })
-const fliesMesh = new InstancedMesh(flyGeometry, flyMaterial, flynum)
-const flyGismo = new Object3D()
-scene.add(fliesMesh)
-
-const noise2D = createNoise2D()
-
-const flies = Array(flynum).fill(null).map((_, i) => {
-  const color = "#fff"
-  const light = new PointLight(color, 1.5, 3)
-  light.castShadow = true
-  light.shadow.mapSize = new Vector2(128, 128)
-  light.shadow.camera.near = 0.1
-  light.shadow.camera.far = 3
-  light.shadow.bias = 0.00003
-  light.shadow.normalBias = 0.05
-  scene.add(light)
-
-  const start = Math.random() * Math.PI * 2
-  const vel = 0.001 + Math.random() * 0.002
-  const dir = Math.sign(Math.random() - 0.5)
-  const distance = 1.4 + Math.random() * 3.3
-
-  let t = 0
-  const update = () => {
-    const n = noise2D(t + start, 0)
-    const d = distance + distance * n / 2
-    const dt = distance / d
-
-    flyGismo.position.set(
-      Math.cos(start + t * dir * Math.PI * 2) * d,
-      2 + n * 1.5,
-      Math.sin(start + t * dir * Math.PI * 2) * d,
-    )
-    t += vel * dt
-    light.position.copy(flyGismo.position)
-
-    flyGismo.updateMatrix()
-    fliesMesh.setMatrixAt(i, flyGismo.matrix)
-  }
-  return { update }
-})
-
-
-
 const grid = new GridHelper(100, 100, 0x444444, 0x222222)
 grid.position.y = 0.001
 // scene.add(grid)
@@ -186,8 +138,7 @@ grid.position.y = 0.001
 
 
 const play = () => {
-  flies.forEach((ghost) => ghost.update())
-  fliesMesh.instanceMatrix.needsUpdate = true
+  updateFlies()
 }
 
 export { play }
