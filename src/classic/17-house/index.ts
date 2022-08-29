@@ -38,7 +38,7 @@ floor.rotation.x = -Math.PI / 2
 floor.receiveShadow = true
 scene.add(floor)
 
-const fog = new Fog("#fa7", 5, 15)
+const fog = new Fog("#b74", 5, 15)
 scene.fog = fog
 
 orbit.addEventListener("change", () => {
@@ -86,12 +86,10 @@ grid.position.y = 0.001
 
 
 
-const play = () => {
+export const play = () => {
   updateFlies()
 }
 
-export { play }
 
 
-
-gui.add(ambientLight, "intensity").min(0).max(1).step(0.001)
+gui.add(ambientLight, "intensity").min(0).max(1).step(0.001).name("ambient")
