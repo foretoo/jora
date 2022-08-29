@@ -12,8 +12,14 @@ scene.add(fliesMesh)
 const noise2D = createNoise2D()
 
 const flies = Array(flynum).fill(null).map((_, i) => {
+
+  const start = Math.random() * Math.PI * 2
+  const vel = 0.001 + Math.random() * 0.002
+  const dir = Math.sign(Math.random() - 0.5)
+  const distance = 1.4 + Math.random() * 3.3
+
   const color = "#fff"
-  const light = new PointLight(color, 1.5, 3)
+  const light = new PointLight(color, 1, 3)
   light.castShadow = true
   light.shadow.mapSize = new Vector2(128, 128)
   light.shadow.camera.near = 0.1
@@ -21,11 +27,6 @@ const flies = Array(flynum).fill(null).map((_, i) => {
   light.shadow.bias = 0.00003
   light.shadow.normalBias = 0.05
   scene.add(light)
-
-  const start = Math.random() * Math.PI * 2
-  const vel = 0.001 + Math.random() * 0.002
-  const dir = Math.sign(Math.random() - 0.5)
-  const distance = 1.4 + Math.random() * 3.3
 
   let t = 0
   const update = () => {
@@ -40,6 +41,7 @@ const flies = Array(flynum).fill(null).map((_, i) => {
     )
     t += vel * dt
     light.position.copy(flyGismo.position)
+    light.intensity = d / 3
 
     flyGismo.updateMatrix()
     fliesMesh.setMatrixAt(i, flyGismo.matrix)
