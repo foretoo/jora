@@ -2,7 +2,7 @@ import * as dat from "dat.gui"
 import { controls } from "./controls"
 
 const gui = new dat.GUI()
-console.log(controls);
+// gui.close()
 
 export const initGUI = () => {
   gui.add(controls, "attractor", controls.list)
@@ -18,7 +18,7 @@ export const initGUI = () => {
   })
 
   gui.add(controls, "noiseStrength", 0, 1, 0.01)
-  gui.add(controls, "noiseScale", 0.5, 2, 0.01)
+  gui.add(controls, "noiseScale", 0.5, 5, 0.01)
   gui.add(controls, "roughness", 0, 1, 0.01)
   gui.add(controls, "vel", 0, 4, 0.05)
 
