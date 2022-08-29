@@ -2,7 +2,7 @@ import { scene, camera, renderer, orbit } from "../../init"
 import * as dat from "dat.gui"
 import { AmbientLight, CameraHelper, DirectionalLight, DirectionalLightHelper, Fog, GridHelper, Mesh, MeshStandardMaterial, PCFSoftShadowMap, PlaneBufferGeometry, Vector2 } from "three"
 import { getRTTData } from "./rtt"
-import { getSnowFellas } from "./snowfellas"
+import { getFellas } from "./fellas"
 import { updateFlies } from "./flies"
 import { initIgloo } from "./igloo"
 
@@ -40,11 +40,8 @@ const {
   buffer: noiseData
 } = getRTTData(renderer)
 
-const fellas = getSnowFellas(0.1, noiseData)
-fellas.material.flatShading = true
-fellas.castShadow = true
-fellas.receiveShadow = true
-scene.add(fellas)
+getFellas(noiseData)
+
 
 const floor = new Mesh(
   new PlaneBufferGeometry(10, 10, 64, 64),

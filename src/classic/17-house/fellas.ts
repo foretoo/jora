@@ -1,10 +1,11 @@
-import { Color, ConeGeometry, CylinderBufferGeometry, DoubleSide, InstancedMesh, MeshStandardMaterial, Object3D, SphereBufferGeometry } from "three"
+import { InstancedMesh, MeshStandardMaterial, Object3D, SphereBufferGeometry } from "three"
 import PoissonDiskSampling from "poisson-disk-sampling"
+import { scene } from "../../init"
 
 
 
-export const getSnowFellas = (
-  radius: number,
+const radius = 0.1
+export const getFellas = (
   noiseData: Uint8Array
 ) => {
 
@@ -49,6 +50,9 @@ export const getSnowFellas = (
   const geometry = new SphereBufferGeometry(radius, 3, 1, 0, Math.PI * 2, 0, Math.PI / 2) // new ConeGeometry(radius, radius * 2, 12, 1, true) // new CylinderBufferGeometry(radius / 2, radius, radius * 2, 12, 1)
   const material = new MeshStandardMaterial({ color: "#fff" })
   const mesh = new InstancedMesh(geometry, material, count)
+  mesh.material.flatShading = true
+  mesh.castShadow = true
+  mesh.receiveShadow = true
 
   const gizmo = new Object3D()
 
@@ -76,5 +80,5 @@ export const getSnowFellas = (
     mesh.setMatrixAt(i, gizmo.matrix)
   }
 
-  return mesh
+  scene.add(mesh)
 }
