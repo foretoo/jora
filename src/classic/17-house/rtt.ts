@@ -5,45 +5,58 @@ const scene = new Scene()
 const camera = new OrthographicCamera(-1, 1, 1, -1, 0, 1)
 camera.position.z = 1
 
-scene.add(
-  new Mesh(
-    new PlaneBufferGeometry(2, 2),
-    new ShaderMaterial({
-      vertexShader: `
-        varying vec2 vUv;
+const vertexShader = `
+varying vec2 vUv;
 
-        void main() {
-          vUv = uv;
-          gl_Position = vec4(position, 1.0);
-        }`,
-      fragmentShader: `
-        varying vec2 vUv;
-        const float PI = 3.14159265;
+void main() {
+  vUv = uv;
+  gl_Position = vec4(position, 1.0);
+}`
 
-        #include snoise2D;
+const seed = Math.random() * 10
+let getFragmentShader = (bw = false) => `
+varying vec2 vUv;
+const float PI = 3.14159265;
 
-        void main() {
-          float noise = snoise2D(vUv * 3.0 + ${Math.random() * 10}) * 0.5 + 0.5;
-          noise *= noise * noise;
-          float center = abs(sin(vUv.y * PI)) * abs(sin(vUv.x * PI));
-          center *= center;
-          float bottom = cos(vUv.y * PI * 0.5 + PI * 0.333);
+#include snoise2D;
 
-          float value = 1.0 - center * 2.0 - bottom * 1.0 - noise * 1.6;
+void main() {
+  float noise = snoise2D(vUv * 3.0 + ${seed}) * 0.5 + 0.5;
+  noise *= noise * noise;
+  float center = abs(sin(vUv.y * PI)) * abs(sin(vUv.x * PI));
+  center *= center;
+  float bottom = cos(vUv.y * PI * 0.5 + PI * 0.333);
 
-          float red = smoothstep(0.0, 1.0, 1.0 - value);
-          float green = 0.5 - 0.25 * value * red;
-          float blue = 0.8;
-          gl_FragColor = vec4(red, green, blue, value);
-        }`
-        .replace("#include snoise2D;", snoise2D),
-    })
-  )
+  float value = 1.0 - center * 2.0 - bottom * 1.0 - noise * 1.6;
+  value = clamp(value, 0.0, 1.0);
+${bw ? "" : `
+  float red = 0.4 + 0.6 * value;
+  float blue = (1.0 - value) * 0.3;
+  float green = smoothstep(0.0, 1.0, 1.0 - value) * 0.2;
+`}
+  vec3 color = vec3(${bw ? "value" : "red, green, blue"});
+  gl_FragColor = vec4(color, 1.0);
+}`
+.replace("#include snoise2D;", snoise2D)
+
+const plane = new Mesh(
+  new PlaneBufferGeometry(2, 2),
+  new ShaderMaterial({
+    vertexShader,
+    fragmentShader: getFragmentShader(),
+  })
 )
 
-const size = 256
+scene.add(plane)
 
-const offscreen = new WebGLRenderTarget(size, size, {
+const size = 64
+
+const diffuseTarget = new WebGLRenderTarget(size, size, {
+  magFilter: NearestFilter,
+  minFilter: NearestFilter,
+  depthBuffer: false,
+})
+const alphaTarget = new WebGLRenderTarget(size, size, {
   magFilter: NearestFilter,
   minFilter: NearestFilter,
   depthBuffer: false,
@@ -54,13 +67,20 @@ const offscreen = new WebGLRenderTarget(size, size, {
 export const getRTTData = (
   renderer: WebGLRenderer
 ) => {
-  renderer.setRenderTarget(offscreen)
+  renderer.setRenderTarget(diffuseTarget)
   renderer.render(scene, camera)
+
+  renderer.setRenderTarget(alphaTarget)
+  plane.material.fragmentShader = getFragmentShader(true)
+  plane.material.needsUpdate = true
+  renderer.render(scene, camera)
+
   renderer.setRenderTarget(null)
 
   const buffer = new Uint8Array(size * size * 4)
-  renderer.readRenderTargetPixels(offscreen, 0, 0, size, size, buffer)
-  const texture = offscreen.texture
+  renderer.readRenderTargetPixels(alphaTarget, 0, 0, size, size, buffer)
+  const texture = diffuseTarget.texture
+  const alpha = alphaTarget.texture
   
-  return { texture, buffer }
+  return { texture, alpha, buffer }
 }
