@@ -1,103 +1,163 @@
-import { material } from "."
-import { positionVar } from "./gpgpu"
 import aizawaShader from "./shaders/aizawa.glsl"
 import thomasShader from "./shaders/thomas.glsl"
 
-export const controls = {
+type IThomas = {
+  b: number
+}
+type IAizawa = {
+  a: number
+  b: number
+  c: number
+  d: number
+  e: number
+  f: number
+}
+type nCall = ((v: number) => void)[]
+interface IControls {
+  listen: {
+    attractor: ((shader: string) => void)[]
+    noiseScale: nCall
+    noiseStrength: nCall
+    roughness: nCall
+    vel: nCall
+    thomas: {
+      b: nCall
+    }
+    aizawa: {
+      a: nCall
+      b: nCall
+      c: nCall
+      d: nCall
+      e: nCall
+      f: nCall
+    }
+  }
+  shader: string
+  list: [ "thomas", "aizawa" ]
+  attractor: "thomas" | "aizawa"
+  noiseScale: number
+  noiseStrength: number
+  roughness: number
+  vel: number
+  thomas: IThomas
+  aizawa: IAizawa
+}
+
+const _controls: Omit<IControls, "listen" | "shader" | "list"> = {
+  attractor: "aizawa",
+  noiseScale: 5,
+  noiseStrength: 0.2,
+  roughness: 0.1,
+  vel: 2.0,
+  thomas: {
+    b: 0.208186
+  },
+  aizawa: {
+    a: 1.0,
+    b: 0.0,
+    c: 1.3, // inner radius
+    d: 0.0,
+    e: 0.2,
+    f: 0.0,
+  }
+}
+
+export const controls: IControls = {
+  listen: {
+    attractor: [],
+    noiseScale: [],
+    noiseStrength: [],
+    roughness: [],
+    vel: [],
+    thomas: {
+      b: []
+    },
+    aizawa: {
+      a: [],
+      b: [],
+      c: [],
+      d: [],
+      e: [],
+      f: [],
+    }
+  },
+
   shader: aizawaShader,
 
   list: [ "thomas", "aizawa" ],
 
-  _attractor: "aizawa",
-  get attractor() { return controls._attractor },
+  get attractor() { return _controls.attractor },
   set attractor(v) {
-    controls._attractor = v
-    if (v === "aizawa") {
-      controls.shader = aizawaShader
-      positionVar.material.fragmentShader = aizawaShader
-    }
-    else {
-      controls.shader = thomasShader
-      positionVar.material.fragmentShader = thomasShader
-    }
-    positionVar.material.needsUpdate = true
+    _controls.attractor = v
+    if (v === "aizawa") controls.shader = aizawaShader
+    else controls.shader = thomasShader
+    controls.listen.attractor.forEach((callback) => callback(controls.shader))
   },
 
-  _noiseScale: 1,
-  get noiseScale() { return controls._noiseScale },
+  get noiseScale() { return _controls.noiseScale },
   set noiseScale(v) {
-    controls._noiseScale = v
-    material.uniforms.noiseScale.value = 1 / v
+    _controls.noiseScale = v
+    controls.listen.noiseScale.forEach((callback) => callback(1 / _controls.noiseScale))
   },
 
-  _noiseStrength: 0.1,
-  get noiseStrength() { return controls._noiseStrength },
+  get noiseStrength() { return _controls.noiseStrength },
   set noiseStrength(v) {
-    controls._noiseStrength = v
-    material.uniforms.noiseStrength.value = v
+    _controls.noiseStrength = v
+    controls.listen.noiseStrength.forEach((callback) => callback(v))
   },
   
-  _roughness: 0.0,
-  get roughness() { return controls._roughness },
+  get roughness() { return _controls.roughness },
   set roughness(v) {
-    controls._roughness = v
-    positionVar.material.uniforms.roughness.value = v
+    _controls.roughness = v
+    controls.listen.roughness.forEach((callback) => callback(v))
   },
 
-  _vel: 2.0,
-  get vel() { return controls._vel },
+  get vel() { return _controls.vel },
   set vel(v) {
-    controls._vel = v
-    positionVar.material.uniforms.vel.value = v
+    _controls.vel = v
+    controls.listen.vel.forEach((callback) => callback(v))
   },
 
   thomas: {
-    _b: 0.208186,
-    get b() { return controls.thomas._b },
+    get b() { return _controls.thomas.b },
     set b(v) {
-      controls.thomas._b = v
-      positionVar.material.uniforms.tb.value = v
+      _controls.thomas.b = v
+      controls.listen.thomas.b.forEach((callback) => callback(v))
     },
   },
 
   aizawa: {
-    _a: 1.0,
-    _b: 0.5,
-    _c: 1.5,
-    _d: 0.0,
-    _e: 0.2,
-    _f: 0.0,
 
-    get a() { return controls.aizawa._a },
-    get b() { return controls.aizawa._b },
-    get c() { return controls.aizawa._c },
-    get d() { return controls.aizawa._d },
-    get e() { return controls.aizawa._e },
-    get f() { return controls.aizawa._f },
+    get a() { return _controls.aizawa.a },
+    get b() { return _controls.aizawa.b },
+    get c() { return _controls.aizawa.c },
+    get d() { return _controls.aizawa.d },
+    get e() { return _controls.aizawa.e },
+    get f() { return _controls.aizawa.f },
 
     set a(v) {
-      controls.aizawa._a = v
-      positionVar.material.uniforms.aa.value = v
+      _controls.aizawa.a = v
+      controls.listen.aizawa.a.forEach((callback) => callback(v))
     },
     set b(v) {
-      controls.aizawa._b = v
-      positionVar.material.uniforms.ab.value = v
+      _controls.aizawa.b = v
+      controls.listen.aizawa.b.forEach((callback) => callback(v))
     },
     set c(v) {
-      controls.aizawa._c = v
-      positionVar.material.uniforms.ac.value = v
+      _controls.aizawa.c = v
+      controls.listen.aizawa.c.forEach((callback) => callback(v))
     },
     set d(v) {
-      controls.aizawa._d = v
-      positionVar.material.uniforms.ad.value = v
+      _controls.aizawa.d = v
+      controls.listen.aizawa.d.forEach((callback) => callback(v))
     },
     set e(v) {
-      controls.aizawa._e = v
-      positionVar.material.uniforms.ae.value = v
+      _controls.aizawa.e = v
+      controls.listen.aizawa.e.forEach((callback) => callback(v))
     },
     set f(v) {
-      controls.aizawa._f = v
-      positionVar.material.uniforms.af.value = v
+      _controls.aizawa.f = v
+      controls.listen.aizawa.f.forEach((callback) => callback(v))
     },
   },
 }
