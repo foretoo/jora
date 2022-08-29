@@ -1,8 +1,8 @@
 import { scene, camera, renderer, orbit } from "../../init"
 import * as dat from "dat.gui"
 import { AmbientLight, CameraHelper, DirectionalLight, DirectionalLightHelper, Fog, GridHelper, Mesh, MeshStandardMaterial, PCFSoftShadowMap, PlaneBufferGeometry, Vector2 } from "three"
-import { getRTTData } from "./rtt"
-import { getFellas } from "./fellas"
+import { rttAlpha, rttColor } from "./rtt"
+import { initFellas } from "./fellas"
 import { updateFlies } from "./flies"
 import { initIgloo } from "./igloo"
 
@@ -14,19 +14,10 @@ camera.position.set(2, 5, 8)
 renderer.shadowMap.enabled = true
 renderer.shadowMap.type = PCFSoftShadowMap
 
-const fog = new Fog("#fa7", 5, 15)
-scene.fog = fog
-// scene.background = new Color("#7af")
-
-orbit.addEventListener("change", () => {
-  const length = camera.position.length()
-  fog.near = length - 5
-  fog.far = length + 5
-})
-
 
 
 initIgloo()
+initFellas()
 
 
 
@@ -34,27 +25,27 @@ initIgloo()
  * ENVIRONMENT
  */
 
-const {
-  texture: colorTexture,
-  alpha: alphaTexture,
-  buffer: noiseData
-} = getRTTData(renderer)
-
-getFellas(noiseData)
-
-
 const floor = new Mesh(
   new PlaneBufferGeometry(10, 10, 64, 64),
   new MeshStandardMaterial({
     color: "#adf",
-    map: colorTexture,
-    displacementMap: alphaTexture,
+    map: rttColor,
+    displacementMap: rttAlpha,
     displacementScale: 0.62,
   }),
 )
 floor.rotation.x = -Math.PI / 2
 floor.receiveShadow = true
 scene.add(floor)
+
+const fog = new Fog("#fa7", 5, 15)
+scene.fog = fog
+
+orbit.addEventListener("change", () => {
+  const length = camera.position.length()
+  fog.near = length - 5
+  fog.far = length + 5
+})
 
 
 

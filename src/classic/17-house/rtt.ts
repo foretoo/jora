@@ -1,4 +1,5 @@
 import { Mesh, NearestFilter, OrthographicCamera, PlaneBufferGeometry, Scene, ShaderMaterial, WebGLRenderer, WebGLRenderTarget } from "three";
+import { renderer } from "../../init";
 import snoise2D from "./snoise2D.glsl"
 
 const scene = new Scene()
@@ -64,23 +65,19 @@ const alphaTarget = new WebGLRenderTarget(size, size, {
 
 
 
-export const getRTTData = (
-  renderer: WebGLRenderer
-) => {
-  renderer.setRenderTarget(diffuseTarget)
-  renderer.render(scene, camera)
+renderer.setRenderTarget(diffuseTarget)
+renderer.render(scene, camera)
 
-  renderer.setRenderTarget(alphaTarget)
-  plane.material.fragmentShader = getFragmentShader(true)
-  plane.material.needsUpdate = true
-  renderer.render(scene, camera)
+renderer.setRenderTarget(alphaTarget)
+plane.material.fragmentShader = getFragmentShader(true)
+plane.material.needsUpdate = true
+renderer.render(scene, camera)
 
-  renderer.setRenderTarget(null)
+renderer.setRenderTarget(null)
 
-  const buffer = new Uint8Array(size * size * 4)
-  renderer.readRenderTargetPixels(alphaTarget, 0, 0, size, size, buffer)
-  const texture = diffuseTarget.texture
-  const alpha = alphaTarget.texture
-  
-  return { texture, alpha, buffer }
-}
+const rttBuffer = new Uint8Array(size * size * 4)
+renderer.readRenderTargetPixels(alphaTarget, 0, 0, size, size, rttBuffer)
+const rttColor = diffuseTarget.texture
+const rttAlpha = alphaTarget.texture
+
+export { rttColor, rttAlpha, rttBuffer }
