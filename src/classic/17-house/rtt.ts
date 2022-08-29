@@ -31,9 +31,9 @@ void main() {
   float value = 1.0 - center * 2.0 - bottom * 1.0 - noise * 1.6;
   value = clamp(value, 0.0, 1.0);
 ${bw ? "" : `
-  float red = 0.4 + 0.6 * value;
-  float blue = (1.0 - value) * 0.3;
-  float green = smoothstep(0.0, 1.0, 1.0 - value) * 0.2;
+  float red = 0.7 + 0.3 * value;
+  float blue = 0.3 + 0.7 * value;
+  float green = 0.2 + 0.8 * smoothstep(0.0, 1.0, value);
 `}
   vec3 color = vec3(${bw ? "value" : "red, green, blue"});
   gl_FragColor = vec4(color, 1.0);
@@ -50,7 +50,7 @@ const plane = new Mesh(
 
 scene.add(plane)
 
-const size = 64
+const size = 256
 
 const diffuseTarget = new WebGLRenderTarget(size, size, {
   magFilter: NearestFilter,
