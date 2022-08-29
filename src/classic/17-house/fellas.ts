@@ -1,4 +1,4 @@
-import { InstancedMesh, MeshStandardMaterial, Object3D, SphereBufferGeometry } from "three"
+import { InstancedMesh, MeshStandardMaterial, Object3D, Shader, SphereBufferGeometry } from "three"
 import PoissonDiskSampling from "poisson-disk-sampling"
 import { scene } from "../../init"
 import { rttBuffer } from "./rtt"
@@ -45,8 +45,38 @@ const getPoints = (): [number, number][] | undefined => {
 const points = getPoints()
 const count = points?.length || 0
 
-const geometry = new SphereBufferGeometry(radius, 3, 1, 0, Math.PI * 2, 0, Math.PI / 2) // new ConeGeometry(radius, radius * 2, 12, 1, true) // new CylinderBufferGeometry(radius / 2, radius, radius * 2, 12, 1)
-const material = new MeshStandardMaterial({ color: "#fff" })
+const geometry = new SphereBufferGeometry(radius, 3, 1, 0, Math.PI * 2, 0, Math.PI / 2)
+const material = new MeshStandardMaterial()
+
+material.onBeforeCompile = (shader: Shader) => {
+  shader.vertexShader =
+    "varying vec3 vPosition;\n" +
+    shader.vertexShader
+      .replace(/#ifdef USE_TRANSMISSION|#endif/g, "")
+      .replace(
+        "#include <begin_vertex>",
+        "vPosition = vec3( position ); vec3 transformed = vec3( position );"
+      )
+
+  shader.fragmentShader = shader.fragmentShader
+    .replace(
+      "varying vec3 vViewPosition;", 
+      "varying vec3 vViewPosition; varying vec3 vWorldPosition; varying vec3 vPosition;"
+    )
+    .replace(
+      "#include <color_fragment>",
+      `
+      float py = vPosition.y * 10.0;
+      vec3 wp = vWorldPosition;
+      float v = smoothstep(0.0, 1.0, 0.3 + wp.y / 2.5 * 0.7);
+
+      diffuseColor.rgb = vec3(1.0 - (1.0 - v) * py, (v + py) * 0.5, py);
+      `
+    )
+}
+
+material.needsUpdate = true
+
 const mesh = new InstancedMesh(geometry, material, count)
 mesh.material.flatShading = true
 mesh.castShadow = true
