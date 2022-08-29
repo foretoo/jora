@@ -18,7 +18,7 @@ export const getSnowFellas = (
     _x = Math.floor(x),
     _y = Math.floor(y),
     i = (_y * size + _x) * 4
-    return noiseData[i + 3] / 255
+    return noiseData[i] / 255
   }
 
   let tryNum = 20
@@ -27,15 +27,15 @@ export const getSnowFellas = (
       tryNum--
       const points: [number, number][] = new PoissonDiskSampling({
         shape: [ size, size ],
-        minDistance: 18,
-        maxDistance: 108,
+        minDistance: size / 16,
+        maxDistance: size / 2,
         tries: 40,
         distanceFunction: (p: [ number, number ]) => {
           const v = getValue(p[0], p[1])
           return v > 0.3 ? 0 : 1 - v
         },
       }).fill()
-      if (points?.length < 50) throw undefined
+      if (points?.length < 40) throw undefined
       return points
     }
     catch (err) {
@@ -47,7 +47,7 @@ export const getSnowFellas = (
   const count = points?.length || 0
 
   const geometry = new SphereBufferGeometry(radius, 3, 1, 0, Math.PI * 2, 0, Math.PI / 2) // new ConeGeometry(radius, radius * 2, 12, 1, true) // new CylinderBufferGeometry(radius / 2, radius, radius * 2, 12, 1)
-  const material = new MeshStandardMaterial({ color: "#fff", side: DoubleSide })
+  const material = new MeshStandardMaterial({ color: "#fff" })
   const mesh = new InstancedMesh(geometry, material, count)
 
   const gizmo = new Object3D()
@@ -63,6 +63,7 @@ export const getSnowFellas = (
     const v = Math.max(getValue(px, py), 0.25)
     const scaleH = 1 + v * Math.random() * 9
     const scaleV = v * scaleH * 3
+    gizmo.position.y += v * v * 0.62
     gizmo.scale.set(scaleH, scaleV, scaleH)
 
     gizmo.rotation.set(
