@@ -33,6 +33,10 @@ void main() {
 afterimagePass.shaderMaterial.needsUpdate = true
 composer.addPass( afterimagePass )
 
+addEventListener("resize", () => {
+  composer.setSize(innerWidth, innerHeight)  
+})
+
 export const renderComposer = () => {
   composer.render()
 }
