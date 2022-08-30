@@ -46,14 +46,14 @@ interface IControls {
 const _controls: Omit<IControls, "listen" | "shader" | "list"> = {
   attractor: "aizawa",
   noiseScale: 5,
-  noiseStrength: 0.2,
-  roughness: 0.1,
+  noiseStrength: 0.0,
+  roughness: 0.0,
   vel: 2.0,
   thomas: {
     b: 0.208186
   },
   aizawa: {
-    a: 1.0,
+    a: 1.1,
     b: 0.0,
     c: 1.3, // inner radius
     d: 0.0,
