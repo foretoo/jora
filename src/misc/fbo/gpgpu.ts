@@ -16,6 +16,7 @@ export const getGPGPU = (
   const p = sphere.geometry.attributes.position.array
 
 
+
   const data = new Float32Array(width * height * 4)
   for (let i = 0; i < data.length; i++) {
     data[i * 4 + 0] = p[(i * 3 + 0) % l] + (Math.random() * 2 - 1) * 0.333
@@ -28,6 +29,9 @@ export const getGPGPU = (
   positionTexture.image.data.set(data)
   const positionVar = gpuCompute.addVariable("positionTexture", controls.shader, positionTexture)
 
+
+
+  // uniforms
   positionVar.material.uniforms.vel = { value: controls.vel }
   positionVar.material.uniforms.roughness = { value: controls.roughness }
 
@@ -39,6 +43,7 @@ export const getGPGPU = (
   positionVar.material.uniforms.ae = { value: controls.aizawa.e }
   positionVar.material.uniforms.af = { value: controls.aizawa.f }
 
+  // listeners
   controls.listen.roughness.push((v) => positionVar.material.uniforms.roughness.value = v)
   controls.listen.vel.push((v) => positionVar.material.uniforms.vel.value = v)
   
@@ -54,6 +59,8 @@ export const getGPGPU = (
     positionVar.material.fragmentShader = shader
     positionVar.material.needsUpdate = true
   })
+
+
 
   positionVar.wrapS = RepeatWrapping
   positionVar.wrapT = RepeatWrapping
