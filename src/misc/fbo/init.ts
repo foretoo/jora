@@ -18,7 +18,10 @@ camera.position.set(0, 0, 2)
 export const orbit = new TrackballControls(camera, canvas)
 
 // Renderer
-export const renderer = new WebGLRenderer({ canvas })
+export const renderer = new WebGLRenderer({
+  canvas,
+  preserveDrawingBuffer: true,
+})
 renderer.setSize(innerWidth, innerHeight)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
