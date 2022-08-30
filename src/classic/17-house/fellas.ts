@@ -95,7 +95,7 @@ for (let i = 0; i < count; i++) {
   const v = Math.max(getValue(px, py), 0.25)
   const scaleH = 1 + v * Math.random() * 9
   const scaleV = v * scaleH * 3
-  gizmo.position.y += v * v * 0.62
+  gizmo.position.y += v * v * 0.8
   gizmo.scale.set(scaleH, scaleV, scaleH)
 
   gizmo.rotation.set(

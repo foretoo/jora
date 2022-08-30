@@ -31,7 +31,7 @@ const floor = new Mesh(
     color: "#adf",
     map: rttColor,
     displacementMap: rttAlpha,
-    displacementScale: 0.62,
+    displacementScale: 0.8,
   }),
 )
 floor.rotation.x = -Math.PI / 2
@@ -65,6 +65,7 @@ moonLight.shadow.normalBias = 0.05
 
 const directHelper = new DirectionalLightHelper(moonLight, 0.2)
 setTimeout(() => directHelper.update(), 0)
+directHelper.visible = false
 
 const directCamera = new CameraHelper(moonLight.shadow.camera)
 moonLight.shadow.camera.near = 2
@@ -75,7 +76,7 @@ moonLight.shadow.camera.top = 5
 moonLight.shadow.camera.bottom = -4
 moonLight.shadow.camera.updateProjectionMatrix()
 setTimeout(() => directCamera.update(), 0)
-// directCamera.visible = false
+directCamera.visible = false
 scene.add(moonLight, directHelper, directCamera)
 
 
