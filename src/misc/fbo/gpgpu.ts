@@ -18,9 +18,9 @@ export const getGPGPU = (
 
   const data = new Float32Array(width * height * 4)
   for (let i = 0; i < data.length; i++) {
-    data[i * 4 + 0] = p[(i * 3 + 0) % l]
-    data[i * 4 + 1] = p[(i * 3 + 1) % l]
-    data[i * 4 + 2] = p[(i * 3 + 2) % l]
+    data[i * 4 + 0] = p[(i * 3 + 0) % l] + (Math.random() * 2 - 1) * 0.333
+    data[i * 4 + 1] = p[(i * 3 + 1) % l] + (Math.random() * 2 - 1) * 0.333
+    data[i * 4 + 2] = p[(i * 3 + 2) % l] + (Math.random() * 2 - 1) * 0.333
     data[i * 4 + 3] = 1
   }
 
