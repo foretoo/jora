@@ -91,17 +91,10 @@ const getSphereMaterial = (
 
   fragmentShader: `
   void main() {
-    gl_FragColor = vec4(vec3(0.0), 1.0);
+    gl_FragColor = vec4(vec3(0.0), 0.7);
   }`,
 
   transparent: true,
-  blending: NormalBlending,
-  // blending: CustomBlending,
-  // blendEquation: AddEquation,
-  // blendSrc: SrcAlphaFactor,
-  // blendDst:OneMinusSrcAlphaFactor,
-  // depthWrite: true,
-  // depthTest: true
 })
 
 export const sphere = new Points(geometry, getSphereMaterial(0, 1))
