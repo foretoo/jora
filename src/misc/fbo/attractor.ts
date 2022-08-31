@@ -8,8 +8,8 @@ import fragmentShader from "./shaders/fragment.glsl"
 
 
 
-const width  = 256
-const height = 256
+const width  = 128
+const height = width
 const computePositionTexture = getGPGPU(width, height, renderer)
 
 
