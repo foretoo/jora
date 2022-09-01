@@ -6,7 +6,7 @@ const plane = new Mesh(
   new MeshBasicMaterial({
     color: 0xffffff,
     transparent: true,
-    opacity: 0.1
+    opacity: 0.333
   })
 )
 plane.position.z = -5

@@ -12,9 +12,9 @@ camera.position.set(0, 0, 12)
 
 
 
-const updateSphere1 = initSphere(Math.random() * 123, 0.25)
-const updateSphere2 = initSphere(Math.random() * 123, 0.35)
-const updateSphere3 = initSphere(Math.random() * 123, 0.30)
+const updateSphere1 = initSphere(Math.random() * 123, 0.26)
+const updateSphere2 = initSphere(Math.random() * 123, 0.24)
+const updateSphere3 = initSphere(Math.random() * 123, 0.22)
 
 
 
