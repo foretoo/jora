@@ -53,8 +53,9 @@ const getSphereMaterial = (
 
   #include cnoise;
 
+  const float PI = 3.14159265;
+
   void main() {
-    gl_PointSize = 1.2;
     float t = time * 0.15 + seed * 10.0;
 
 
@@ -64,13 +65,13 @@ const getSphereMaterial = (
     vec3 pos = mix(position, cpos, 1.0 - n * 0.1);
 
     gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
-
+    gl_PointSize = cos(abs(pos.z * PI / 2.0)) * 2.0;
   }`
     .replace("#include cnoise;", cnoise),
 
   fragmentShader: `
   void main() {
-    gl_FragColor = vec4(vec3(0.0), 0.2);
+    gl_FragColor = vec4(vec3(0.0), 0.4);
   }`,
 
   transparent: true,
