@@ -64,8 +64,10 @@ const getSphereMaterial = (
     float n = snoise(position + t) * 0.5 + 0.5;
     vec3 pos = mix(position, cpos, 1.0 - n * 0.1);
 
-    gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
-    gl_PointSize = cos(abs(pos.z * PI / 2.0)) * 2.0;
+    vec4 mvPos = modelViewMatrix * vec4(pos, 1.0);
+
+    gl_Position = projectionMatrix * mvPos;
+    gl_PointSize = cos(abs(mvPos.z * PI / 2.0)) * 2.0;
   }`
     .replace("#include cnoise;", cnoise),
 
@@ -88,7 +90,10 @@ export const initSphere = (
   controls.listen.noiseStrength.push((v) => material.uniforms.noiseStrength.value = v)
   const sphere = new Points(geometry, material)
   scene.add(sphere)
-  return (t: number) => {
+
+  return (
+    t: number,
+  ) => {
     material.uniforms.time.value = t
   }
 }
