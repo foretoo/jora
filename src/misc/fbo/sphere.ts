@@ -1,5 +1,5 @@
 import { controls } from "./controls"
-import { AddEquation, AdditiveBlending, BufferAttribute, BufferGeometry, CustomBlending, MaxEquation, Mesh, MinEquation, MultiplyBlending, NormalBlending, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, Points, ShaderMaterial, SphereBufferGeometry, SrcAlphaFactor, SrcColorFactor, SubtractiveBlending, Vector3 } from "three"
+import { AddEquation, AdditiveBlending, BufferAttribute, BufferGeometry, CustomBlending, DstColorFactor, MaxEquation, Mesh, MinEquation, MultiplyBlending, MultiplyOperation, NormalBlending, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, Points, ShaderMaterial, SphereBufferGeometry, SrcAlphaFactor, SrcColorFactor, SubtractEquation, SubtractiveBlending, Vector3 } from "three"
 import { MeshSurfaceSampler } from "three/examples/jsm/math/MeshSurfaceSampler.js"
 import { scene } from "./init"
 
@@ -60,38 +60,17 @@ const getSphereMaterial = (
 
     vec3 cpos = cnoise(position * scale + t) * 1.0;
 
-    // float n = snoise(position + t) * 0.5 + 0.5;
-    // vec3 pos = mix(position, cpos, 0.5);
+    float n = snoise(position + t) * 0.5 + 0.5;
+    vec3 pos = mix(position, cpos, 1.0 - n * 0.1);
 
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
 
-    // float n = snoise(position + t) * 0.5 + 0.5;
-    // vec3 spos = position * n;
-
-    // vec3 pos = cnoise(cpos * 0.6 + t);
-    // pos = mix(position, cpos, 1.0 - n * 0.2);
-
-
-    gl_Position = projectionMatrix * modelViewMatrix * vec4(cpos, 1.0);
-
-
-
-    // float uCurlFreq = 0.7;
-    // vec3 pos = position;
-    // vec3 curlPos = position;
-    // pos = cnoise(pos * uCurlFreq + t);
-    // curlPos =  cnoise(curlPos * uCurlFreq + t);
-    // curlPos += cnoise(curlPos * uCurlFreq * 2.0) * 0.5;
-    // curlPos += cnoise(curlPos * uCurlFreq * 4.0) * 0.25;
-    // curlPos += cnoise(curlPos * uCurlFreq * 8.0) * 0.125;
-    // curlPos += cnoise(pos * uCurlFreq * 16.0) * 0.0625;
-
-    // gl_Position = projectionMatrix * modelViewMatrix * vec4(mix(pos, curlPos, snoise(pos + t)), 1.0);
   }`
     .replace("#include cnoise;", cnoise),
 
   fragmentShader: `
   void main() {
-    gl_FragColor = vec4(vec3(0.0), 0.5);
+    gl_FragColor = vec4(vec3(0.0), 0.2);
   }`,
 
   transparent: true,
