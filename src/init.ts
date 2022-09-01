@@ -8,8 +8,10 @@ let
   width = window.innerWidth,
   height = window.innerHeight
 
+
 // Canvas
 const canvas = document.querySelector("canvas")!
+
 
 // Scene
 const scene = new Scene()
@@ -19,12 +21,11 @@ const scene = new Scene()
 const aspect = width / height
 const camera = new PerspectiveCamera(75, aspect, 0.1, 100)
 camera.position.set(0, 0, 2)
-scene.add(camera)
 
 const logs = document.querySelector("#logs")!
 const orbit = new OrbitControls(camera, canvas)
 
-orbit.addEventListener("change", (e) => {
+orbit.addEventListener("change", () => {
   logs.innerHTML =
     `pos: (${camera.position.x.toFixed(4)}, ${camera.position.y.toFixed(4)}, ${camera.position.z.toFixed(4)})\n` +
     `rot: (${camera.rotation.x.toFixed(4)}, ${camera.rotation.y.toFixed(4)}, ${camera.rotation.z.toFixed(4)})`
@@ -36,7 +37,7 @@ const renderer = new WebGLRenderer({ canvas })
 renderer.setSize(width, height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
-window.onresize = () => {
+addEventListener("resize", () => {
   width = window.innerWidth
   height = window.innerHeight
 
@@ -44,7 +45,7 @@ window.onresize = () => {
   camera.updateProjectionMatrix()
 
   renderer.setSize(width, height)  
-}
+})
 
 
 // Looper
