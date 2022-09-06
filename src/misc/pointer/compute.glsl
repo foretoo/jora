@@ -1,10 +1,12 @@
 uniform sampler2D positionTexture;
+uniform vec2 pointer;
 
 void main() {
-  vec2 ref = gl_FragCoord.xy / resolution.xy;
-  vec4 prev = texture(positionTexture, ref);
+  vec2 uv = gl_FragCoord.xy / resolution.xy;
+  vec4 position = texture(positionTexture, uv);
 
-  vec4 next = prev + 0.001;
+  position.x += pointer.x * 0.002;
+  position.y += pointer.y * 0.002;
 
-  gl_FragColor = next;
+  gl_FragColor = position;
 }
