@@ -27,3 +27,10 @@ addEventListener("resize", () => {
 
 
 export const gpu = new GPUComputationRenderer(SIDE, SIDE, renderer)
+
+export const pointer = new Float32Array(2)
+
+addEventListener("pointermove", (e) => {
+  pointer[0] = e.clientX / innerWidth  *  2 - 1
+  pointer[1] = e.clientY / innerHeight * -2 + 1
+})
