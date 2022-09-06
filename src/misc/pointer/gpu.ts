@@ -1,0 +1,29 @@
+import { NearestFilter, RepeatWrapping } from "three"
+import { INITIAL_DATA, SIDE } from "./const"
+import { gpu } from "./setup"
+import computeShader from "./compute.glsl"
+
+
+
+const positionTexture = gpu.createTexture()
+positionTexture.image.data.set(INITIAL_DATA)
+
+const material = gpu.createShaderMaterial(
+  computeShader,
+  { positionTexture: { value: positionTexture }}
+)
+
+
+
+const renderTarget = Array(2).fill(null).map(() => (
+  gpu.createRenderTarget(SIDE, SIDE, RepeatWrapping, RepeatWrapping, NearestFilter, NearestFilter)
+))
+
+
+
+let i = 1
+export const compute = (time: number) => {
+  gpu.doRenderTarget(material, renderTarget[i^=1])
+  material.uniforms.positionTexture.value = renderTarget[i].texture
+  return renderTarget[i].texture
+}
