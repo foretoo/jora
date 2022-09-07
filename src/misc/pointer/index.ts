@@ -1,11 +1,11 @@
 import { camera, orbit, renderer, scene } from "./setup"
-import { initiateSphere } from "./sphere"
+import { initiateGPUSphere } from "./gpu-sphere"
 
 
 
 camera.position.set(0, 0, 3)
 
-const updateGPUSphere = initiateSphere()
+const updateGPUSphere = initiateGPUSphere()
 
 
 

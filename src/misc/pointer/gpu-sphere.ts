@@ -29,7 +29,7 @@ const sphereMaterial = new ShaderMaterial({
 
 
 
-export const initiateSphere = () => {
+export const initiateGPUSphere = () => {
   const sphere = new Points(sphereGeometry, sphereMaterial)
   scene.add(sphere)
 
