@@ -1,5 +1,5 @@
 import { InstancedMesh, MeshBasicMaterial, Object3D, OctahedronBufferGeometry } from "three"
-import { getIcoVertecies } from "./icosah"
+import { getIcoVertecies } from "./ico-vertecies"
 
 
 
