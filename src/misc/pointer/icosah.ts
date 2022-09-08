@@ -19,23 +19,28 @@ import { IcosahedronBufferGeometry } from "three"
 
 
 
-const ico = new IcosahedronBufferGeometry(1, 2)
+export const getIcoVertecies = (
+  radius?: number,
+  detail?: number,
+) => {
+  const ico = new IcosahedronBufferGeometry(radius, detail)
 
-const icoP = ico.attributes.position.array
-const icoN = ico.attributes.position.count
-const icoS = ico.attributes.position.itemSize
-const icoA = icoN * icoS
+  const pos = ico.attributes.position.array
+  const count = ico.attributes.position.count
+  const size = ico.attributes.position.itemSize
+  const amount = count * size
 
-const icoarr: number[] = []
-const icoSet = new Set<string>()
+  const vertecies: number[] = []
+  const vertexSet = new Set<string>()
 
-for (let i = 0; i < icoA; i += icoS) {
-  const p = [ icoP[i], icoP[i+1], icoP[i+2] ]
-  const pstr = JSON.stringify(p)
-  if (!icoSet.has(pstr)) {
-    icoarr.push(...p)
-    icoSet.add(pstr)
+  for (let i = 0; i < amount; i += size) {
+    const p = [ pos[i], pos[i+1], pos[i+2] ]
+    const pstr = JSON.stringify(p)
+    if (!vertexSet.has(pstr)) {
+      vertecies.push(...p)
+      vertexSet.add(pstr)
+    }
   }
-}
 
-export const icosahpoints = new Float32Array(icoarr)
+  return vertecies
+}

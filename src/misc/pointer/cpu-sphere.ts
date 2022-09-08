@@ -1,23 +1,30 @@
 import { InstancedMesh, MeshBasicMaterial, Object3D, OctahedronBufferGeometry } from "three"
-import { icosahpoints } from "./icosah"
+import { getIcoVertecies } from "./icosah"
 
 
 
-const pointGeometry = new OctahedronBufferGeometry(0.05)
-const pointMaterial = new MeshBasicMaterial({ color: 0xffffff })
+export const getIco = (
+  radius?: number,
+  detail?: number,
+  vertexRadius?: number
+) => {
+  const icoVertecies = getIcoVertecies(radius, detail)
+  const unitGeometry = new OctahedronBufferGeometry(vertexRadius || 0.01)
+  const unitMaterial = new MeshBasicMaterial({ color: 0xffffff })
 
-const points = new InstancedMesh(pointGeometry, pointMaterial, icosahpoints.length / 3)
+  const icoMesh = new InstancedMesh(unitGeometry, unitMaterial, icoVertecies.length / 3)
 
-const gizmo = new Object3D()
-for (let i = 0; i < icosahpoints.length / 3; i++) {
-  gizmo.position.set(
-    icosahpoints[i * 3 + 0],
-    icosahpoints[i * 3 + 1],
-    icosahpoints[i * 3 + 2],
-  )
-  gizmo.updateMatrix()
-  points.setMatrixAt(i, gizmo.matrix)
+  const gizmo = new Object3D()
+  for (let i = 0; i < icoVertecies.length / 3; i++) {
+    gizmo.position.set(
+      icoVertecies[i * 3 + 0],
+      icoVertecies[i * 3 + 1],
+      icoVertecies[i * 3 + 2],
+    )
+    gizmo.updateMatrix()
+    icoMesh.setMatrixAt(i, gizmo.matrix)
+  }
+
+
+  return [ icoMesh, icoVertecies ] as [ InstancedMesh<OctahedronBufferGeometry, MeshBasicMaterial>, number[] ]
 }
-
-
-export const initiateCPUSphere = () => points
