@@ -8,6 +8,7 @@ import { icosahpoints } from "./icosah"
 camera.position.set(0, 0, 3)
 
 const sphere = initiateCPUSphere()
+sphere.scale.multiplyScalar(0.5)
 scene.add(sphere)
 
 
@@ -25,32 +26,30 @@ const wScale = hScale * camera.aspect
 const pointer = { x: 0, y: 0}
 
 addEventListener("pointermove", (e) => {
-  for (let i = 0; i < 12; i++) {
-    if (icosahpoints[i * 3 + 2] >= 0) {
-      pointer.x = (e.clientX / innerWidth  *  2 - 1) * wScale
-      pointer.y = (e.clientY / innerHeight * -2 + 1) * hScale
+  for (let i = 0; i < sphere.count; i++) {
+    pointer.x = (e.clientX / innerWidth  *  2 - 1) * wScale
+    pointer.y = (e.clientY / innerHeight * -2 + 1) * hScale
 
-      const x = icosahpoints[i * 3 + 0]
-      const y = icosahpoints[i * 3 + 1]
-      const z = icosahpoints[i * 3 + 2]
+    const x = icosahpoints[i * 3 + 0]
+    const y = icosahpoints[i * 3 + 1]
+    const z = icosahpoints[i * 3 + 2]
 
-      const [ dx, dy ] = [ x - pointer.x, y - pointer.y ]
-      const len = Math.sqrt(dx ** 2 + dy ** 2)
-      const dir = { x: dx / len, y: dy / len }
+    const [ dx, dy ] = [ x - pointer.x, y - pointer.y ]
+    const len = Math.sqrt(dx ** 2 + dy ** 2)
+    const dir = { x: dx / len, y: dy / len }
 
-      const f = len < 2 ? Math.cos(len * Math.PI / 4) / 2 : 0
-      const zlen = Math.sqrt(pointer.x ** 2 + pointer.y ** 2)
-      const zf = zlen < 1.9 ? Math.cos((zlen / 1.9) * (Math.PI / 2)) / 2 : 0
+    const f = len < 2 ? Math.cos(len * Math.PI / 4) / 2 : 0
+    const zlen = Math.sqrt(pointer.x ** 2 + pointer.y ** 2)
+    const zf = zlen < 1 ? Math.cos(zlen * (Math.PI / 2)) / 2 : 0
 
-      mat.makeTranslation(
-        x + dir.x * f * f,
-        y + dir.y * f * f,
-        z * (1 + zf * zf)
-      )
+    mat.makeTranslation(
+      x + dir.x * f * f,
+      y + dir.y * f * f,
+      z * (1 + zf * zf)
+    )
 
-      sphere.setMatrixAt(i, mat)
-      sphere.instanceMatrix.needsUpdate = true
-    }
+    sphere.setMatrixAt(i, mat)
+    sphere.instanceMatrix.needsUpdate = true
   }
 })
 
