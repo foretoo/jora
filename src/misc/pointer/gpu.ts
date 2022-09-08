@@ -1,6 +1,6 @@
 import { NearestFilter, RepeatWrapping } from "three"
 import { INITIAL_DATA, SIDE } from "./const"
-import { gpu, pointer } from "./setup"
+import { gpu } from "./setup"
 import computeShader from "./compute.glsl"
 
 
@@ -12,7 +12,7 @@ const material = gpu.createShaderMaterial(
   computeShader,
   {
     positionTexture: { value: positionTexture },
-    pointer: { value: pointer },
+    pointer: { value: null },
   }
 )
 
@@ -25,7 +25,10 @@ const renderTarget = Array(2).fill(null).map(() => (
 
 
 let i = 1
-export const compute = (time: number) => {
+export const compute = (
+  time: number,
+  pointer: number[]
+) => {
   gpu.doRenderTarget(material, renderTarget[i^=1])
   material.uniforms.positionTexture.value = renderTarget[i].texture
   material.uniforms.pointer.value = pointer
