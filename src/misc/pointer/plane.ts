@@ -26,9 +26,9 @@ for (let y = 1; y > -2; y--) {
 
 
 export const updatePlane = (
-  pointer: { x: number, y: number, f: number }
+  pointer: { x: number, y: number, d: number }
 ) => {
-  if (pointer.f < 1e-8) return
+  if (pointer.d < 1e-8) return
   for (let i = 0; i < plane.count; i++) {
     
     plane.getMatrixAt(i, mat)
@@ -42,17 +42,18 @@ export const updatePlane = (
     let vx = vel[i].x
     let vy = vel[i].y
 
+    let dx = x - pointer.x
+    let dy = y - pointer.y
+
 
 
     // push from pointer
 
-    let dx = x - pointer.x
-    let dy = y - pointer.y
-    let dd = Math.sqrt(dx**2 + dy**2)
-    let f = dd < 1 ? Math.cos(dd * Math.PI / 2) : 0
+    const dd = Math.sqrt(dx ** 2 + dy ** 2)
+    const f = dd < 1 ? Math.cos(dd * Math.PI / 2) : 0
 
-    vx += (dx / dd) * f * pointer.f * 0.01
-    vy += (dy / dd) * f * pointer.f * 0.01
+    vx += (dx / dd) * f * pointer.d * 0.01
+    vy += (dy / dd) * f * pointer.d * 0.01
 
     // fade out pushing
 

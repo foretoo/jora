@@ -1,33 +1,22 @@
+import { Matrix4 } from "three"
 import { camera, orbit, renderer, scene } from "./setup"
 import { getIco } from "./cpu-sphere"
-import { Matrix4 } from "three"
+import { initiatePointer } from "./pointer"
 
 
 
 camera.position.set(0, 0, 3)
+const pointer = initiatePointer()
 
-const [ ico, ip ] = getIco(1, 2, 0.02)
+
+
+const [ ico, ip ] = getIco(1, 5, 0.02)
 scene.add(ico)
-
-
 
 const mat = new Matrix4()
 
-
-
-const f = Math.tan((camera.fov * Math.PI) / 360)
-const hScale = f * camera.position.distanceTo(ico.position)
-const wScale = hScale * camera.aspect
-
-
-
-const pointer = { x: 0, y: 0}
-
-addEventListener("pointermove", (e) => {
+const update = () => {
   for (let i = 0; i < ico.count; i++) {
-    pointer.x = (e.clientX / innerWidth  *  2 - 1) * wScale
-    pointer.y = (e.clientY / innerHeight * -2 + 1) * hScale
-
     const x = ip[i * 3 + 0]
     const y = ip[i * 3 + 1]
     const z = ip[i * 3 + 2]
@@ -47,13 +36,19 @@ addEventListener("pointermove", (e) => {
     ico.setMatrixAt(i, mat)
     ico.instanceMatrix.needsUpdate = true
   }
-})
+}
+
+
+
+
 
 
 
 let t = 0
 export const play = () => {
   t += 0.01
+
+  update()
 
   orbit.update()
   renderer.render(scene, camera)
