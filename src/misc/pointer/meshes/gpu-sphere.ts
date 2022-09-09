@@ -1,9 +1,9 @@
 import { BufferAttribute, BufferGeometry, Points, ShaderMaterial } from "three"
-import { AMOUNT, INITIAL_DATA, SIDE } from "./const"
-import { scene } from "./setup"
-import { compute } from "./gpu"
-import vertexShader from "./vertex.glsl"
-import fragmentShader from "./fragment.glsl"
+import { AMOUNT, INITIAL_DATA, SIDE } from "../const"
+import { scene } from "../setup"
+import { compute } from "../gpu"
+import vertexShader from "../vertex.glsl"
+import fragmentShader from "../fragment.glsl"
 
 
 
