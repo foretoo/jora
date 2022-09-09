@@ -35,7 +35,7 @@ export const initiateGPUSphere = () => {
 
   return (
     t: number,
-    pointer: { x: number, y: number, d: number },
+    pointer: { x: number, y: number, z: number, d: number },
   ) => {
     sphereMaterial.uniforms.positionTexture.value = compute(t, pointer)
   }
