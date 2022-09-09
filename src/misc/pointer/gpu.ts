@@ -1,43 +1,74 @@
 import { NearestFilter, RepeatWrapping } from "three"
 import { INITIAL_DATA, SIDE } from "./const"
 import { gpu } from "./setup"
-import computeShader from "./compute.glsl"
+import computePositionShader from "./compute-position.glsl"
+import computeVelocityShader from "./compute-velocity.glsl"
 
 
 
-const positionTexture = gpu.createTexture()
-positionTexture.image.data.set(INITIAL_DATA)
+const vecPointer = new Float32Array(4)
 
-const vecPointer = new Float32Array(3)
-const material = gpu.createShaderMaterial(
-  computeShader,
+const velocityTexture = gpu.createTexture()
+
+const initialPositionTexture = gpu.createTexture()
+initialPositionTexture.image.data.set(INITIAL_DATA)
+
+const currentPositionTexture = gpu.createTexture()
+currentPositionTexture.image.data.set(INITIAL_DATA)
+
+
+
+const velocityMaterial = gpu.createShaderMaterial(
+  computeVelocityShader,
   {
-    positionTexture: { value: positionTexture },
+    initialPositionTexture: { value: initialPositionTexture },
+    currentPositionTexture: { value: currentPositionTexture },
+    velocityTexture: { value: velocityTexture },
     pointer: { value: vecPointer },
+  }
+)
+
+const positionMaterial = gpu.createShaderMaterial(
+  computePositionShader,
+  {
+    currentPositionTexture: { value: currentPositionTexture },
+    velocityTexture: { value: velocityTexture },
   }
 )
 
 
 
-const renderTarget = Array(2).fill(null).map(() => (
+const positionTarget = Array(2).fill(null).map(() => (
+  gpu.createRenderTarget(SIDE, SIDE, RepeatWrapping, RepeatWrapping, NearestFilter, NearestFilter)
+))
+const velocityTarget = Array(2).fill(null).map(() => (
   gpu.createRenderTarget(SIDE, SIDE, RepeatWrapping, RepeatWrapping, NearestFilter, NearestFilter)
 ))
 
-
+console.log(Math.PI);
 
 let i = 1
 export const compute = (
   time: number,
-  pointer: { x: number, y: number, d: number },
+  pointer: { x: number, y: number, z: number, d: number },
 ) => {
+  i^=1
+
   vecPointer[0] = pointer.x
   vecPointer[1] = pointer.y
-  vecPointer[2] = pointer.d
+  vecPointer[2] = pointer.z
+  vecPointer[3] = pointer.d
 
-  gpu.doRenderTarget(material, renderTarget[i^=1])
+  velocityMaterial.uniforms.pointer.value = vecPointer
+  gpu.doRenderTarget(velocityMaterial, velocityTarget[i])
 
-  material.uniforms.positionTexture.value = renderTarget[i].texture
-  material.uniforms.pointer.value = pointer
+  velocityMaterial.uniforms.velocityTexture.value = velocityTarget[i].texture
+  positionMaterial.uniforms.velocityTexture.value = velocityTarget[i].texture
 
-  return renderTarget[i].texture
+  gpu.doRenderTarget(positionMaterial, positionTarget[i])
+
+  velocityMaterial.uniforms.currentPositionTexture.value = positionTarget[i].texture
+  positionMaterial.uniforms.currentPositionTexture.value = positionTarget[i].texture
+
+  return positionTarget[i].texture
 }
