@@ -24,7 +24,7 @@ void main() {
     ? cos((dlen / LEN) * PI) * 0.5 + 0.5
     : 0.0;
   force *= min(tan(force * PI / 2.0) * force, 55.0) / 55.0;
-  force *= pointer.w * 0.04;
+  force *= pointer.w * 0.05;
 
   // push from pointer
   velocity += normalize(diff) * force;
