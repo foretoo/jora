@@ -1,4 +1,4 @@
-import { camera, scene } from "./setup"
+import { camera, orbit, scene } from "./setup"
 
 
 
@@ -8,12 +8,21 @@ export const initiatePointer = (
   z = 0,
   d = 0,
 ) => {
+
   const f = Math.tan((camera.fov * Math.PI) / 360)
-  const hScale = f * camera.position.distanceTo(scene.position)
-  const wScale = hScale * camera.aspect
+  let hScale = f * camera.position.distanceTo(scene.position)
+  let wScale = hScale * camera.aspect
+
+  addEventListener("resize", () => wScale = hScale * camera.aspect)
+
+  orbit.addEventListener("change", () => {
+    hScale = f * camera.position.distanceTo(scene.position)
+    wScale = hScale * camera.aspect
+  })
+
+
 
   const prevPointer = { x, y, z }
-
   const pointer = { x, y, z, d }
 
   addEventListener("pointermove", (e) => {
