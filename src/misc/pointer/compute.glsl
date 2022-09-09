@@ -1,5 +1,5 @@
 uniform sampler2D positionTexture;
-uniform vec2 pointer;
+uniform vec3 pointer;
 
 void main() {
   vec2 uv = gl_FragCoord.xy / resolution.xy;

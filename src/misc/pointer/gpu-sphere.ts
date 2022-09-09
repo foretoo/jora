@@ -34,8 +34,9 @@ export const initiateGPUSphere = () => {
   scene.add(sphere)
 
   return (
-    t: number
+    t: number,
+    pointer: { x: number, y: number, d: number },
   ) => {
-    sphereMaterial.uniforms.positionTexture.value = compute(t, null)
+    sphereMaterial.uniforms.positionTexture.value = compute(t, pointer)
   }
 }
