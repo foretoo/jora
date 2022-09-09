@@ -13,6 +13,7 @@ export const camera = new PerspectiveCamera(60, innerWidth / innerHeight, 0.1, 1
 
 export const orbit = new TrackballControls(camera, canvas)
 orbit.staticMoving = true
+orbit.noPan = true
 
 export const renderer = new WebGLRenderer({ canvas })
 renderer.setSize(innerWidth, innerHeight)
