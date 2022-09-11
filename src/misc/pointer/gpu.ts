@@ -45,7 +45,7 @@ const velocityTarget = Array(2).fill(null).map(() => (
   gpu.createRenderTarget(SIDE, SIDE, RepeatWrapping, RepeatWrapping, NearestFilter, NearestFilter)
 ))
 
-console.log(Math.PI);
+
 
 let i = 1
 export const compute = (
