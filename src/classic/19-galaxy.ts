@@ -95,7 +95,7 @@ function generateGalaxy() {
 
     // Core positions
 
-    let { x, y, z } = getPoint(coreSize)
+    let { x, y, z } = getRandomBallPoint(coreSize)
     length = Math.sqrt(x * x + y * y + z * z) / coreSize
     let logLength = length * length * length
     logLength = logLength < 0.1 ? Math.sqrt(logLength) : logLength
@@ -260,7 +260,7 @@ function generateGalaxy() {
         float len = sqrt(p.x * p.x + p.y * p.y + p.z * p.z);
         len /= uLength * 1.618;
         len = 1.0 - sqrt(len);
-        float t = -1.0 * uTime * len;
+        float t = - uTime * len + cos(uTime) * len;
         transformed.x = p.x * cos(t) - p.z * sin(t);
         transformed.z = p.x * sin(t) + p.z * cos(t);
         `
@@ -286,16 +286,16 @@ generateGalaxy()
 
 
 export const play = () => {
-  t += parameters.velocity / 500
-  stars.rotation.y = t / 2
-  stars.rotation.y = t / 2
+  t += parameters.velocity / 5e3
+  core.rotation.y = t
+  stars.rotation.y = t
   core.material.uniforms.uTime.value = t
   starsUniforms.uTime.value = t
 }
 
 
 
-function getPoint(
+function getRandomBallPoint(
   radius: number
 ) {
   const u = Math.random()
