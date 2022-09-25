@@ -4,6 +4,7 @@ import { camera, scene } from "../init"
 
 
 
+const pr = Math.min(devicePixelRatio, 2)
 camera.position.set(0, 2, 4)
 const giu = new dat.GUI()
 
@@ -188,7 +189,7 @@ function generateGalaxy() {
 
     // Sizes
 
-    starsSizes[i / 3] = Math.random() * Math.sqrt(4 - step * 4) * parameters.size
+    starsSizes[i / 3] = Math.random() * Math.sqrt(4 - step * 4) * parameters.size * (pr / 2)
 
     // Positions
 
@@ -285,6 +286,36 @@ generateGalaxy()
 
 
 
+const envStarsGeometry = new BufferGeometry()
+
+const envStarsCount = 64 ** 2
+const envStarsPositions = new Float32Array(envStarsCount * 3)
+for (let i = 0; i < envStarsCount; i++) {
+  const { x, y, z } = getRandomBallPoint(21, (r: number) => Math.pow(r, 1 / 3))
+  envStarsPositions[i * 3 + 0] = x
+  envStarsPositions[i * 3 + 1] = y
+  envStarsPositions[i * 3 + 2] = z
+}
+
+envStarsGeometry.setAttribute("position", new BufferAttribute(envStarsPositions, 3))
+
+const envStarsMaterial = new PointsMaterial({
+  size: 0.1,
+  sizeAttenuation: true,
+  alphaMap: aTexture,
+  alphaTest: 0.1,
+  blending: AdditiveBlending,
+  transparent: true,
+  depthWrite: false,
+  depthTest: false,
+})
+
+const envStars = new Points(envStarsGeometry, envStarsMaterial)
+scene.add(envStars)
+
+
+
+
 export const play = () => {
   t += parameters.velocity / 5e3
   core.rotation.y = t
@@ -296,17 +327,23 @@ export const play = () => {
 
 
 function getRandomBallPoint(
-  radius: number
+  radius: number,
+  radiusModifier?: (radius: number) => number
 ) {
   const u = Math.random()
   const v = Math.random()
   const theta = u * 2.0 * Math.PI
   const phi = Math.acos(2.0 * v - 1.0)
-  const r = Math.random() * radius
+
+  let r = Math.random()
+  radiusModifier && (r = radiusModifier(r))
+  r *= radius
+
   const sinTheta = Math.sin(theta)
   const cosTheta = Math.cos(theta)
   const sinPhi = Math.sin(phi)
   const cosPhi = Math.cos(phi)
+
   const x = r * sinPhi * cosTheta
   const y = r * sinPhi * sinTheta
   const z = r * cosPhi
