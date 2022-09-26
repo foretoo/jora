@@ -1,4 +1,4 @@
-import { AdditiveBlending, BufferAttribute, BufferGeometry, Color, GridHelper, PerspectiveCamera, Points, RawShaderMaterial, Scene, TextureLoader, WebGLRenderer } from "three"
+import { AdditiveBlending, BufferAttribute, BufferGeometry, Color, PerspectiveCamera, Points, RawShaderMaterial, Scene, TextureLoader, WebGLRenderer } from "three"
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
 import GUI from "three/examples/jsm/libs/lil-gui.module.min.js"
 
@@ -42,7 +42,7 @@ const galaxyMaterial = new RawShaderMaterial({
     uBranches: { value: 2 },
     uRadius: { value: 1 },
     uSpin: { value: Math.round(Math.PI * 2 * 100) / 100 },
-    uRandomness: { value: 0.5 },
+    uRandomness: { value: 0.38 },
     uAlphaMap: { value: alphaMap },
     uColorInn: { value: [ ci.r, ci.g, ci.b ] },
     uColorOut: { value: [ co.r, co.g, co.b ] },
@@ -69,30 +69,7 @@ varying float vDistance;
 #define PI  3.14159265359
 #define PI2 6.28318530718
 
-
-
-float random (vec2 st) {
-  return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);
-}
-
-vec3 rough3D (vec3 point, float radius) {
-  float u = random(point.xy);
-  float v = random(point.yz);
-  float theta = u * 6.28318530718;
-  float phi = acos(2.0 * v - 1.0);
-
-  float sinTheta = sin(theta);
-  float cosTheta = cos(theta);
-  float sinPhi = sin(phi);
-  float cosPhi = cos(phi);
-
-  float r = random(point.zx) * radius;
-  float x = r * sinPhi * cosTheta;
-  float y = r * sinPhi * sinTheta;
-  float z = r * cosPhi;
-
-  return vec3(x, y, z);
-}
+#include rough3D
 
 
 
@@ -109,7 +86,7 @@ void main() {
   p.x = position.x * cos(angle + branchOffset) * uRadius;
   p.z = position.x * sin(angle + branchOffset) * uRadius;
 
-  p += rough3D(seed, uRandomness * mt);
+  p += rough3D(seed) * random(seed.zx) * uRandomness * mt;
   p.y *= 0.333 + qt * 0.667;
 
   vDistance = mt;
@@ -168,8 +145,8 @@ const coreMaterial = new RawShaderMaterial({
 precision highp float;
 
 attribute vec3 position;
-attribute float size;
 attribute vec3 seed;
+attribute float size;
 uniform mat4 projectionMatrix;
 uniform mat4 modelViewMatrix;
 
@@ -179,29 +156,7 @@ uniform float uRadius;
 #define PI  3.14159265359
 #define PI2 6.28318530718
 
-
-
-float random (vec2 st) {
-  return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);
-}
-
-vec3 rough3D (vec3 point) {
-  float u = random(point.xy);
-  float v = random(point.yz);
-  float theta = u * 6.28318530718;
-  float phi = acos(2.0 * v - 1.0);
-
-  float sinTheta = sin(theta);
-  float cosTheta = cos(theta);
-  float sinPhi = sin(phi);
-  float cosPhi = cos(phi);
-
-  float x = sinPhi * cosTheta;
-  float y = sinPhi * sinTheta;
-  float z = cosPhi;
-
-  return vec3(x, y, z);
-}
+#include rough3D
 
 const float r = 13.0;
 
@@ -210,18 +165,16 @@ const float r = 13.0;
 void main() {
 
   float q = random(seed.zx);
-  float s = random(seed.zx);
-  for (int i = 0; i < 4; i++) q *= q;
+  for (int i = 0; i < 3; i++) q *= q;
 
-  vec3 core = rough3D(seed) * q * vec3(2.1, 0.8, 2.1);
-  core *= (r * uRadius * 0.2 + r * q * uRadius * 0.2);
-  vec3 env = rough3D(seed) * s;
+  vec3 p = rough3D(seed) * q * vec3(2.1, 1.3, 2.1) * r;
+  float l = length(p) / (2.1 * r);
+  p = l < 0.001 ? (p / l) * uRadius : p;
 
-  vec3 p = q < 0.075 ? core * r : env * r;
-
-  vec4 mvp = modelViewMatrix * vec4(p, 1.0);
+  vec4 mvp = modelViewMatrix * vec4(p * uRadius, 1.0);
   gl_Position = projectionMatrix * mvp;
-  gl_PointSize = (r * 0.618 * size * uSize * (2.0 - length(p) / r)) / -mvp.z;
+  
+  gl_PointSize = (r * size * uSize) / -mvp.z;
 }
 `,
 
@@ -248,28 +201,6 @@ void main() {
   depthTest: false,
   depthWrite: false,
   blending: AdditiveBlending,
-})
-
-
-
-// GUI
-
-gui.add(galaxyMaterial.uniforms.uSize, "value", 0.1, 4, 0.01).name("size")
-.onChange((size: number) => coreMaterial.uniforms.uSize.value = size)
-gui.add(galaxyMaterial.uniforms.uBranches, "value", 1, 5, 1).name("branches")
-gui.add(galaxyMaterial.uniforms.uRadius, "value", 0.1, 5, 0.1).name("radius")
-.onChange((radius: number) => coreMaterial.uniforms.uRadius.value = radius)
-gui.add(galaxyMaterial.uniforms.uSpin, "value", -Math.PI * 4, Math.PI * 4, 0.01).name("spin")
-gui.add(galaxyMaterial.uniforms.uRandomness, "value", 0.01, 1, 0.01).name("randomness")
-gui.addColor(color, "inn").name("inn color")
-.onChange((hex: string) => {
-  const { r, g, b } = new Color(hex)
-  galaxyMaterial.uniforms.uColorInn.value = [ r, g, b ]
-})
-gui.addColor(color, "out").name("out color")
-.onChange((hex: string) => {
-  const { r, g, b } = new Color(hex)
-  galaxyMaterial.uniforms.uColorOut.value = [ r, g, b ]
 })
 
 
@@ -310,18 +241,48 @@ for (let i = 0; i < count / 2; i++) {
 
 const coreGeometry = new BufferGeometry()
 coreGeometry.setAttribute("position", new BufferAttribute(corePositions, 3))
-coreGeometry.setAttribute("size", new BufferAttribute(coreSizes, 1))
 coreGeometry.setAttribute("seed", new BufferAttribute(coreSeeds, 3))
+coreGeometry.setAttribute("size", new BufferAttribute(coreSizes, 1))
 
 
 
 // Meshes
 
 const branchStars = new Points(galaxyGeometry, galaxyMaterial)
-// scene.add(branchStars)
+branchStars.material.onBeforeCompile = (shader) => {
+  shader.vertexShader = shader.vertexShader
+  .replace("#include rough3D", shaderUtilRough3D)
+}
+scene.add(branchStars)
 
 const coreStars = new Points(coreGeometry, coreMaterial)
+coreStars.material.onBeforeCompile = (shader) => {
+  shader.vertexShader = shader.vertexShader
+  .replace("#include rough3D", shaderUtilRough3D)
+}
 scene.add(coreStars)
+
+
+
+// GUI
+
+gui.add(galaxyMaterial.uniforms.uSize, "value", 0.1, 4, 0.01).name("size")
+.onChange((size: number) => coreMaterial.uniforms.uSize.value = size)
+gui.add(galaxyMaterial.uniforms.uBranches, "value", 1, 5, 1).name("branches")
+gui.add(galaxyMaterial.uniforms.uRadius, "value", 0.01, 5, 0.01).name("radius")
+.onChange((radius: number) => coreMaterial.uniforms.uRadius.value = radius)
+gui.add(galaxyMaterial.uniforms.uSpin, "value", -Math.PI * 4, Math.PI * 4, 0.01).name("spin")
+gui.add(galaxyMaterial.uniforms.uRandomness, "value", 0, 1, 0.01).name("randomness")
+gui.addColor(color, "inn").name("inn color")
+.onChange((hex: string) => {
+  const { r, g, b } = new Color(hex)
+  galaxyMaterial.uniforms.uColorInn.value = [ r, g, b ]
+})
+gui.addColor(color, "out").name("out color")
+.onChange((hex: string) => {
+  const { r, g, b } = new Color(hex)
+  galaxyMaterial.uniforms.uColorOut.value = [ r, g, b ]
+})
 
 
 
@@ -342,3 +303,28 @@ addEventListener("resize", () => {
   camera.updateProjectionMatrix()
   renderer.setSize(innerWidth, innerHeight)  
 })
+
+const shaderUtilRough3D =
+`
+float random (vec2 st) {
+  return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);
+}
+
+vec3 rough3D (vec3 point) {
+  float u = random(point.xy);
+  float v = random(point.yz);
+  float theta = u * 6.28318530718;
+  float phi = acos(2.0 * v - 1.0);
+
+  float sinTheta = sin(theta);
+  float cosTheta = cos(theta);
+  float sinPhi = sin(phi);
+  float cosPhi = cos(phi);
+
+  float x = sinPhi * cosTheta;
+  float y = sinPhi * sinTheta;
+  float z = cosPhi;
+
+  return vec3(x, y, z);
+}
+`
