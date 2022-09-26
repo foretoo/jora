@@ -7,7 +7,7 @@ import { TWEEN } from "three/examples/jsm/libs/tween.module.min.js"
 
 // Setup
 
-const gui = new GUI()
+const gui = new GUI().hide()
 
 const scene = new Scene()
 
@@ -42,7 +42,7 @@ const galaxyMaterial = new RawShaderMaterial({
     uSize: { value: 2 },
     uBranches: { value: 2 },
     uRadius: { value: 0 },
-    uSpin: { value: Math.PI * 0.25 }, // Math.round(Math.PI * 2 * 100) / 100 },
+    uSpin: { value: Math.PI * 0.25 },
     uRandomness: { value: 0 },
     uAlphaMap: { value: alphaMap },
     uColorInn: { value: [ ci.r, ci.g, ci.b ] },
@@ -251,15 +251,13 @@ coreGeometry.setAttribute("size", new BufferAttribute(coreSizes, 1))
 
 const galaxyStars = new Points(galaxyGeometry, galaxyMaterial)
 galaxyStars.material.onBeforeCompile = (shader) => {
-  shader.vertexShader = shader.vertexShader
-  .replace("#include rough3D", shaderUtilRough3D)
+  shader.vertexShader = shader.vertexShader.replace("#include rough3D", shaderUtilRough3D)
 }
 scene.add(galaxyStars)
 
 const coreStars = new Points(coreGeometry, coreMaterial)
 coreStars.material.onBeforeCompile = (shader) => {
-  shader.vertexShader = shader.vertexShader
-  .replace("#include rough3D", shaderUtilRough3D)
+  shader.vertexShader = shader.vertexShader.replace("#include rough3D", shaderUtilRough3D)
 }
 scene.add(coreStars)
 
@@ -267,18 +265,29 @@ scene.add(coreStars)
 
 // GUI
 
-gui.add(galaxyMaterial.uniforms.uSize, "value", 0.1, 4, 0.01).name("size")
+gui.add(galaxyMaterial.uniforms.uSize, "value", 0.1, 4, 0.01)
+.name("size")
 .onChange((size: number) => coreMaterial.uniforms.uSize.value = size)
-gui.add(galaxyMaterial.uniforms.uBranches, "value", 1, 5, 1).name("branches")
-gui.add(galaxyMaterial.uniforms.uRadius, "value", 0, 5, 0.01).name("radius")
+
+gui.add(galaxyMaterial.uniforms.uBranches, "value", 1, 5, 1)
+.name("branches")
+
+const cRadius = gui.add(galaxyMaterial.uniforms.uRadius, "value", 0, 5, 0.01)
+.name("radius")
 .onChange((radius: number) => coreMaterial.uniforms.uRadius.value = radius)
-gui.add(galaxyMaterial.uniforms.uSpin, "value", -Math.PI * 4, Math.PI * 4, 0.01).name("spin")
-gui.add(galaxyMaterial.uniforms.uRandomness, "value", 0, 1, 0.01).name("randomness")
+
+const cSpin = gui.add(galaxyMaterial.uniforms.uSpin, "value", -Math.PI * 4, Math.PI * 4, 0.01)
+.name("spin")
+
+const cRandomness = gui.add(galaxyMaterial.uniforms.uRandomness, "value", 0, 1, 0.01)
+.name("randomness")
+
 gui.addColor(color, "inn").name("inn color")
 .onChange((hex: string) => {
   const { r, g, b } = new Color(hex)
   galaxyMaterial.uniforms.uColorInn.value = [ r, g, b ]
 })
+
 gui.addColor(color, "out").name("out color")
 .onChange((hex: string) => {
   const { r, g, b } = new Color(hex)
@@ -289,34 +298,33 @@ gui.addColor(color, "out").name("out color")
 
 // Animation
 
-const animate = {
-  radius: galaxyMaterial.uniforms.uRadius.value,
-  spin: galaxyMaterial.uniforms.uSpin.value,
-  randomness: galaxyMaterial.uniforms.uRandomness.value,
+new TWEEN.Tween({
+  radius: 0,
+  spin: 0,
+  randomness: 0,
   rotate: 0,
-}
-
-const tween = new TWEEN.Tween(animate).to({
+}).to({
   radius: 2,
   spin: Math.PI * 4,
   randomness: 0.618,
   rotate: Math.PI * 4,
 })
-
 .duration(8000)
-.easing(TWEEN.Easing.Quartic.InOut)
-.repeat(Infinity)
-.repeatDelay(1000)
-.yoyo(true)
+.easing(TWEEN.Easing.Sinusoidal.InOut)
 .onUpdate(({ radius, spin, randomness, rotate }) => {
-  galaxyMaterial.uniforms.uRadius.value = radius
-  galaxyMaterial.uniforms.uSpin.value = spin
-  galaxyMaterial.uniforms.uRandomness.value = randomness
+  cRadius.setValue(radius)
+  cRadius.updateDisplay()
+
+  cSpin.setValue(spin)
+  cSpin.updateDisplay()
+
+  cRandomness.setValue(randomness)
+  cRandomness.updateDisplay()
+
   galaxyStars.rotation.y = rotate
   coreStars.rotation.y = rotate / 2
-
-  coreMaterial.uniforms.uRadius.value = radius
 })
+.onComplete(() => gui.show())
 .start()
 
 
