@@ -1,351 +1,344 @@
-import dat from "dat.gui"
-import { AdditiveBlending, BufferAttribute, BufferGeometry, Color, IUniform, Points, PointsMaterial, RawShaderMaterial, TextureLoader } from "three"
-import { camera, scene } from "../init"
+import { AdditiveBlending, BufferAttribute, BufferGeometry, Color, GridHelper, PerspectiveCamera, Points, RawShaderMaterial, Scene, TextureLoader, WebGLRenderer } from "three"
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
+import GUI from "three/examples/jsm/libs/lil-gui.module.min.js"
 
 
 
-const pr = Math.min(devicePixelRatio, 2)
-camera.position.set(0, 2, 4)
-const giu = new dat.GUI()
+// Setup
 
-const tLoader = new TextureLoader()
-const aTexture = tLoader.load("../../../public/textures/particles/8.png")
-let t = 0
+const gui = new GUI()
+
+const scene = new Scene()
+
+const camera = new PerspectiveCamera(60, innerWidth / innerHeight, 0.1, 100)
+camera.position.set(0, 3, 2)
+
+const canvas = document.querySelector("canvas")!
+
+const renderer = new WebGLRenderer({ canvas })
+renderer.setSize(innerWidth, innerHeight)
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+
+const orbit = new OrbitControls(camera, canvas)
+
+const textureLoader = new TextureLoader()
+const alphaMap = textureLoader.load("../../../public/textures/particles/8.png")
 
 
 
-const parameters = {
-  count: 50000,
-  size: 0.15,
-  branches: 2,
-  length: 2,
-  angle: Math.PI * 2,
-  spread: 0.3,
-  velocity: 1,
-  innColor: "#f40",
-  outColor: "#20f",
+// Branch stars
+
+const color = {
+  inn: "#f40",
+  out: "#a7f",
+}
+const ci = new Color(color.inn)
+const co = new Color(color.out)
+
+const galaxyMaterial = new RawShaderMaterial({
+
+  uniforms: {
+    uSize: { value: 2 },
+    uBranches: { value: 2 },
+    uRadius: { value: 1 },
+    uSpin: { value: Math.round(Math.PI * 2 * 100) / 100 },
+    uRandomness: { value: 0.5 },
+    uAlphaMap: { value: alphaMap },
+    uColorInn: { value: [ ci.r, ci.g, ci.b ] },
+    uColorOut: { value: [ co.r, co.g, co.b ] },
+  },
+
+  vertexShader:
+`
+precision highp float;
+
+attribute vec3 position;
+attribute float size;
+attribute vec3 seed;
+uniform mat4 projectionMatrix;
+uniform mat4 modelViewMatrix;
+
+uniform float uSize;
+uniform float uBranches;
+uniform float uRadius;
+uniform float uSpin;
+uniform float uRandomness;
+
+varying float vDistance;
+
+#define PI  3.14159265359
+#define PI2 6.28318530718
+
+
+
+float random (vec2 st) {
+  return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);
 }
 
-giu.add(parameters, "count", 1000, 100000, 10000)
-  .onFinishChange(generateGalaxy)
-giu.add(parameters, "size", 0.01, 0.2, 0.001)
-  .onFinishChange(generateGalaxy)
-giu.add(parameters, "branches", 2, 7, 1)
-  .onFinishChange(generateGalaxy)
-giu.add(parameters, "length", 1, 7, 0.1)
-  .onFinishChange(generateGalaxy)
-giu.add(parameters, "angle", 0, Math.PI * 4, 0.01)
-  .onFinishChange(generateGalaxy)
-giu.add(parameters, "spread", 0.01, 0.5, 0.01)
-  .onFinishChange(generateGalaxy)
-giu.add(parameters, "velocity", -10, 10, 0.01)
+vec3 rough3D (vec3 point, float radius) {
+  float u = random(point.xy);
+  float v = random(point.yz);
+  float theta = u * 6.28318530718;
+  float phi = acos(2.0 * v - 1.0);
 
-giu.addColor(parameters, "innColor")
-  .onFinishChange(generateGalaxy)
-giu.addColor(parameters, "outColor")
-  .onFinishChange(generateGalaxy)
+  float sinTheta = sin(theta);
+  float cosTheta = cos(theta);
+  float sinPhi = sin(phi);
+  float cosPhi = cos(phi);
 
+  float r = random(point.zx) * radius;
+  float x = r * sinPhi * cosTheta;
+  float y = r * sinPhi * sinTheta;
+  float z = r * cosPhi;
 
-
-// Core
-
-let coreGeometry: BufferGeometry
-let coreMaterial: RawShaderMaterial
-let core: Points<BufferGeometry, RawShaderMaterial>
-
-// Stars
-
-let starsGeometry: BufferGeometry
-let starsMaterial: PointsMaterial
-let stars: Points
-const starsUniforms = {
-  uTime: { value: t },
-  uLength: { value: parameters.length },
-  uVelocity: { value: parameters.velocity },
+  return vec3(x, y, z);
 }
 
-// generator
-
-function generateGalaxy() {
-
-  if (stars && core) {
-    coreGeometry.dispose()
-    coreMaterial.dispose()
-    scene.remove(core)
-
-    starsGeometry.dispose()
-    starsMaterial.dispose()
-    scene.remove(stars)
-
-    t = 0
-    starsUniforms.uLength.value = parameters.length
-  }
 
 
+void main() {
 
-  // CORE
+  vec3 p = position;
+  float st = sqrt(p.x);
+  float qt = p.x * p.x;
+  float mt = mix(st, qt, p.x);
 
-  coreGeometry = new BufferGeometry()
+  float branchOffset = (PI2 / uBranches) * floor(seed.x * uBranches);
+  float angle = qt * uSpin * (2.0 - sqrt(sqrt(1.0 - qt * qt)));
+  vec3 temp = p;
+  p.x = position.x * cos(angle + branchOffset) * uRadius;
+  p.z = position.x * sin(angle + branchOffset) * uRadius;
 
-  const coreCount = parameters.count / 5
-  const corePositions = new Float32Array(coreCount * 3)
-  const coreSizes = new Float32Array(coreCount)
-  const coreSize = parameters.length
+  p += rough3D(seed, uRandomness * mt);
+  p.y *= 0.333 + qt * 0.667;
 
-  for (let i = 0; i < coreCount; i += 3) {
-
-    // Core positions
-
-    let { x, y, z } = getRandomBallPoint(coreSize)
-    length = Math.sqrt(x * x + y * y + z * z) / coreSize
-    let logLength = length * length * length
-    logLength = logLength < 0.1 ? Math.sqrt(logLength) : logLength
-    const logRatio = logLength / length
-    x *= logRatio
-    y *= logRatio
-    z *= logRatio
-
-    corePositions[i + 0] = x
-    corePositions[i + 1] = y * Math.random() * 0.382
-    corePositions[i + 2] = z
-
-    // Core sizes
-
-    length = Math.sqrt(x * x + y * y + z * z) / coreSize
-    coreSizes[i / 3] = (Math.random() + 1) * parameters.size * (1.5 - length)
-
-  }
-
-  coreGeometry.setAttribute("position", new BufferAttribute(corePositions, 3))
-  coreGeometry.setAttribute("size", new BufferAttribute(coreSizes, 1))
-
-  coreMaterial = new RawShaderMaterial({
-    uniforms: {
-      uAlphaMap: { value: aTexture },
-      uColor: { value: new Color(parameters.innColor) },
-      uTime: { value: 0 },
-      uLength: { value: parameters.length },
-    },
-    vertexShader: `
-    uniform mat4 modelViewMatrix;
-    uniform mat4 projectionMatrix;
-    uniform float uTime;
-    uniform float uLength;
-
-    attribute vec3 position;
-    attribute float size;
-
-    void main()	{
-      vec3 p = position;
-      float len = sqrt(p.x * p.x + p.y * p.y + p.z * p.z) / uLength;
-      len /= uLength * 1.382;
-      len = 1.0 - sqrt(len);
-      float t = -1.0 * uTime * len;
-      vec3 rPos = p;
-      rPos.x = p.x * cos(t) - p.z * sin(t);
-      rPos.z = p.x * sin(t) + p.z * cos(t);
-
-      vec4 mvPos = modelViewMatrix * vec4(rPos, 1.0);
-      gl_Position = projectionMatrix * mvPos;
-      gl_PointSize = size * (300.0 / -mvPos.z);
-    }`,
-    fragmentShader: `
-    precision mediump float;
-    uniform vec3 uColor;
-    uniform sampler2D uAlphaMap;
-
-    const float PI = 3.1415;
-
-    void main()	{
-      float a = texture2D(uAlphaMap, gl_PointCoord).x;
-      if (a < 0.1) discard;
-      float c = (sin(gl_PointCoord.x * PI) + sin(gl_PointCoord.y * PI)) * 0.5;
-      c = step(0.99, c);
-      gl_FragColor = vec4(uColor + c, a);
-    }`,
-    transparent: true,
-    blending: AdditiveBlending,
-    depthWrite: false,
-  })
-
-  core = new Points(coreGeometry, coreMaterial)
-  scene.add(core)
+  vDistance = mt;
 
 
 
-  // STARS
-
-  starsGeometry = new BufferGeometry()
-
-  const starsPositions = new Float32Array(parameters.count * 3)
-  const starsColors = new Float32Array(parameters.count * 3)
-  const starsSizes = new Float32Array(parameters.count)
-
-  const starsInnColor = new Color(parameters.innColor)
-  const starsOutColor = new Color(parameters.outColor)
-
-  for (let i = 0; i < parameters.count * 3; i += 3) {
-    let step = Math.sqrt(i / (parameters.count * 3))
-
-    // Sizes
-
-    starsSizes[i / 3] = Math.random() * Math.sqrt(4 - step * 4) * parameters.size * (pr / 2)
-
-    // Positions
-
-    let xOffset = (0.02 * (Math.random() * 2 - 1)) + (Math.random() * 2 - 1) * step * parameters.spread
-    let yOffset = (0.02 * (Math.random() * 2 - 1)) + (Math.random() * 2 - 1) * step * parameters.spread
-    let zOffset = (0.02 * (Math.random() * 2 - 1)) + (Math.random() * 2 - 1) * step * parameters.spread
-
-    const length = Math.sqrt(xOffset * xOffset + yOffset * yOffset + zOffset * zOffset)
-    if (length > parameters.spread) {
-      const normRatio = parameters.spread / length * Math.random()
-      xOffset *= normRatio
-      yOffset *= normRatio
-      zOffset *= normRatio
-    }
-    xOffset *= 3 * Math.random()
-    yOffset *= 2 * Math.random()
-    zOffset *= 3 * Math.random()
-
-    const angle = Math.pow(step, 1 + step * 2) * parameters.angle
-    const angleOffset = (Math.PI * 2 / parameters.branches) * (i % (parameters.branches * 3)) / 3
-    const cos = Math.cos(angle + angleOffset)
-    const sin = Math.sin(angle + angleOffset)
-
-    starsPositions[i + 0] = parameters.length * step * cos + xOffset
-    starsPositions[i + 1] = yOffset
-    starsPositions[i + 2] = parameters.length * step * sin + zOffset
-
-    // Colors
-
-    const mixColor = starsInnColor.clone()
-    mixColor.lerp(starsOutColor, step)
-    const rndColor = new Color(Math.random(), Math.random(), Math.random())
-    mixColor.lerp(rndColor, 0.333)
-
-    starsColors[i + 0] = mixColor.r
-    starsColors[i + 1] = mixColor.g
-    starsColors[i + 2] = mixColor.b
-  }
-
-  starsGeometry.setAttribute("position", new BufferAttribute(starsPositions, 3))
-  starsGeometry.setAttribute("color", new BufferAttribute(starsColors, 3))
-  starsGeometry.setAttribute("size", new BufferAttribute(starsSizes, 1))
-
-  starsMaterial = new PointsMaterial({
-    sizeAttenuation: true,
-    vertexColors: true,
-    alphaMap: aTexture,
-    alphaTest: 0.1,
-    blending: AdditiveBlending,
-    transparent: true,
-    depthWrite: false,
-  })
-
-  starsMaterial.onBeforeCompile = (shader) => {
-    shader.uniforms.uTime = starsUniforms.uTime
-    shader.uniforms.uLength = starsUniforms.uLength
-
-    shader.vertexShader = shader.vertexShader
-      .replace("uniform float size;",
-        `
-        uniform float uTime;
-        uniform float uLength;
-        attribute float size;`,
-      )
-      .replace("#include <begin_vertex>",
-        `
-        #include <begin_vertex>
-        vec3 p = position;
-        float len = sqrt(p.x * p.x + p.y * p.y + p.z * p.z);
-        len /= uLength * 1.618;
-        len = 1.0 - sqrt(len);
-        float t = - uTime * len + cos(uTime) * len;
-        transformed.x = p.x * cos(t) - p.z * sin(t);
-        transformed.z = p.x * sin(t) + p.z * cos(t);
-        `
-      )
-
-    shader.fragmentShader = shader.fragmentShader
-      .replace("outgoingLight = diffuseColor.rgb;",
-        `
-        float c = (sin(gl_PointCoord.x * PI) + sin(gl_PointCoord.y * PI)) * 0.5;
-        c = step(0.99, c);
-        diffuseColor += c;
-        outgoingLight = diffuseColor.rgb;
-        `
-      )
-  }
-
-  stars = new Points(starsGeometry, starsMaterial)
-  scene.add(stars)
-
+  vec4 mvp = modelViewMatrix * vec4(p, 1.0);
+  gl_Position = projectionMatrix * mvp;
+  gl_PointSize = (10.0 * size * uSize) / -mvp.z;
 }
-generateGalaxy()
+`,
+
+  fragmentShader:
+`
+precision highp float;
+
+uniform vec3 uColorInn;
+uniform vec3 uColorOut;
+uniform sampler2D uAlphaMap;
+
+varying float vDistance;
+
+#define PI  3.14159265359
 
 
 
-const envStarsGeometry = new BufferGeometry()
+void main() {
+  vec2 uv = vec2(gl_PointCoord.x, 1.0 - gl_PointCoord.y);
+  float a = texture2D(uAlphaMap, uv).g;
+  if (a < 0.1) discard;
 
-const envStarsCount = 64 ** 2
-const envStarsPositions = new Float32Array(envStarsCount * 3)
-for (let i = 0; i < envStarsCount; i++) {
-  const { x, y, z } = getRandomBallPoint(21, (r: number) => Math.pow(r, 1 / 3))
-  envStarsPositions[i * 3 + 0] = x
-  envStarsPositions[i * 3 + 1] = y
-  envStarsPositions[i * 3 + 2] = z
+  vec3 color = mix(uColorInn, uColorOut, vDistance);
+  float c = step(0.99, (sin(gl_PointCoord.x * PI) + sin(gl_PointCoord.y * PI)) * 0.5);
+  color = max(color, vec3(c));
+
+  gl_FragColor = vec4(color, a);
 }
+`,
 
-envStarsGeometry.setAttribute("position", new BufferAttribute(envStarsPositions, 3))
-
-const envStarsMaterial = new PointsMaterial({
-  size: 0.1,
-  sizeAttenuation: true,
-  alphaMap: aTexture,
-  alphaTest: 0.1,
-  blending: AdditiveBlending,
   transparent: true,
-  depthWrite: false,
   depthTest: false,
+  depthWrite: false,
+  blending: AdditiveBlending,
 })
 
-const envStars = new Points(envStarsGeometry, envStarsMaterial)
-scene.add(envStars)
+const coreMaterial = new RawShaderMaterial({
+
+  uniforms: {
+    uSize: { value: 2 },
+    uRadius: { value: 1 },
+    uAlphaMap: { value: alphaMap },
+  },
+
+  vertexShader:
+`
+precision highp float;
+
+attribute vec3 position;
+attribute float size;
+attribute vec3 seed;
+uniform mat4 projectionMatrix;
+uniform mat4 modelViewMatrix;
+
+uniform float uSize;
+uniform float uRadius;
+
+#define PI  3.14159265359
+#define PI2 6.28318530718
 
 
 
+float random (vec2 st) {
+  return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);
+}
+
+vec3 rough3D (vec3 point) {
+  float u = random(point.xy);
+  float v = random(point.yz);
+  float theta = u * 6.28318530718;
+  float phi = acos(2.0 * v - 1.0);
+
+  float sinTheta = sin(theta);
+  float cosTheta = cos(theta);
+  float sinPhi = sin(phi);
+  float cosPhi = cos(phi);
+
+  float x = sinPhi * cosTheta;
+  float y = sinPhi * sinTheta;
+  float z = cosPhi;
+
+  return vec3(x, y, z);
+}
+
+const float r = 13.0;
+
+
+
+void main() {
+
+  float q = random(seed.zx);
+  float s = random(seed.zx);
+  for (int i = 0; i < 4; i++) q *= q;
+
+  vec3 core = rough3D(seed) * q * vec3(2.1, 0.8, 2.1);
+  core *= (r * uRadius * 0.2 + r * q * uRadius * 0.2);
+  vec3 env = rough3D(seed) * s;
+
+  vec3 p = q < 0.075 ? core * r : env * r;
+
+  vec4 mvp = modelViewMatrix * vec4(p, 1.0);
+  gl_Position = projectionMatrix * mvp;
+  gl_PointSize = (r * 0.618 * size * uSize * (2.0 - length(p) / r)) / -mvp.z;
+}
+`,
+
+  fragmentShader:
+`
+precision highp float;
+
+uniform sampler2D uAlphaMap;
+
+#define PI 3.14159265359
+
+void main() {
+  vec2 uv = vec2(gl_PointCoord.x, 1.0 - gl_PointCoord.y);
+  float a = texture2D(uAlphaMap, uv).g;
+  if (a < 0.1) discard;
+
+  float c = step(0.99, (sin(gl_PointCoord.x * PI) + sin(gl_PointCoord.y * PI)) * 0.5);
+
+  gl_FragColor = vec4(a);
+}
+`,
+
+  transparent: true,
+  depthTest: false,
+  depthWrite: false,
+  blending: AdditiveBlending,
+})
+
+
+
+// GUI
+
+gui.add(galaxyMaterial.uniforms.uSize, "value", 0.1, 4, 0.01).name("size")
+.onChange((size: number) => coreMaterial.uniforms.uSize.value = size)
+gui.add(galaxyMaterial.uniforms.uBranches, "value", 1, 5, 1).name("branches")
+gui.add(galaxyMaterial.uniforms.uRadius, "value", 0.1, 5, 0.1).name("radius")
+.onChange((radius: number) => coreMaterial.uniforms.uRadius.value = radius)
+gui.add(galaxyMaterial.uniforms.uSpin, "value", -Math.PI * 4, Math.PI * 4, 0.01).name("spin")
+gui.add(galaxyMaterial.uniforms.uRandomness, "value", 0.01, 1, 0.01).name("randomness")
+gui.addColor(color, "inn").name("inn color")
+.onChange((hex: string) => {
+  const { r, g, b } = new Color(hex)
+  galaxyMaterial.uniforms.uColorInn.value = [ r, g, b ]
+})
+gui.addColor(color, "out").name("out color")
+.onChange((hex: string) => {
+  const { r, g, b } = new Color(hex)
+  galaxyMaterial.uniforms.uColorOut.value = [ r, g, b ]
+})
+
+
+
+// Geometry
+
+const count = 128 ** 2
+
+const galaxyPositions = new Float32Array(count * 3)
+const galaxySeeds = new Float32Array(count * 3)
+const galaxySizes = new Float32Array(count)
+
+for (let i = 0; i < count; i++) {
+  galaxyPositions[i * 3] = i / count
+  galaxySeeds[i * 3 + 0] = Math.random()
+  galaxySeeds[i * 3 + 1] = Math.random()
+  galaxySeeds[i * 3 + 2] = Math.random()
+  galaxySizes[i] = Math.random() * 2 + 0.5
+}
+
+const galaxyGeometry = new BufferGeometry()
+galaxyGeometry.setAttribute("position", new BufferAttribute(galaxyPositions, 3))
+galaxyGeometry.setAttribute("size", new BufferAttribute(galaxySizes, 1))
+galaxyGeometry.setAttribute("seed", new BufferAttribute(galaxySeeds, 3))
+
+
+
+const corePositions = new Float32Array(count * 3 / 2)
+const coreSeeds = new Float32Array(count * 3 / 2)
+const coreSizes = new Float32Array(count / 2)
+
+for (let i = 0; i < count / 2; i++) {
+  coreSeeds[i * 3 + 0] = Math.random()
+  coreSeeds[i * 3 + 1] = Math.random()
+  coreSeeds[i * 3 + 2] = Math.random()
+  coreSizes[i] = Math.random() * 2 + 0.5
+}
+
+const coreGeometry = new BufferGeometry()
+coreGeometry.setAttribute("position", new BufferAttribute(corePositions, 3))
+coreGeometry.setAttribute("size", new BufferAttribute(coreSizes, 1))
+coreGeometry.setAttribute("seed", new BufferAttribute(coreSeeds, 3))
+
+
+
+// Meshes
+
+const branchStars = new Points(galaxyGeometry, galaxyMaterial)
+// scene.add(branchStars)
+
+const coreStars = new Points(coreGeometry, coreMaterial)
+scene.add(coreStars)
+
+
+
+// Looper
 
 export const play = () => {
-  t += parameters.velocity / 5e3
-  core.rotation.y = t
-  stars.rotation.y = t
-  core.material.uniforms.uTime.value = t
-  starsUniforms.uTime.value = t
+  orbit.update()
+  renderer.render(scene, camera)
+  requestAnimationFrame(play)
 }
 
 
 
-function getRandomBallPoint(
-  radius: number,
-  radiusModifier?: (radius: number) => number
-) {
-  const u = Math.random()
-  const v = Math.random()
-  const theta = u * 2.0 * Math.PI
-  const phi = Math.acos(2.0 * v - 1.0)
+// Helpers
 
-  let r = Math.random()
-  radiusModifier && (r = radiusModifier(r))
-  r *= radius
-
-  const sinTheta = Math.sin(theta)
-  const cosTheta = Math.cos(theta)
-  const sinPhi = Math.sin(phi)
-  const cosPhi = Math.cos(phi)
-
-  const x = r * sinPhi * cosTheta
-  const y = r * sinPhi * sinTheta
-  const z = r * cosPhi
-  return { x, y, z }
-}
+addEventListener("resize", () => {
+  camera.aspect = innerWidth / innerHeight
+  camera.updateProjectionMatrix()
+  renderer.setSize(innerWidth, innerHeight)  
+})
