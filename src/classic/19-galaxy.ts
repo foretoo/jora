@@ -1,6 +1,7 @@
 import { AdditiveBlending, BufferAttribute, BufferGeometry, Color, PerspectiveCamera, Points, RawShaderMaterial, Scene, TextureLoader, WebGLRenderer } from "three"
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
 import GUI from "three/examples/jsm/libs/lil-gui.module.min.js"
+import { TWEEN } from "three/examples/jsm/libs/tween.module.min.js"
 
 
 
@@ -11,7 +12,7 @@ const gui = new GUI()
 const scene = new Scene()
 
 const camera = new PerspectiveCamera(60, innerWidth / innerHeight, 0.1, 100)
-camera.position.set(0, 3, 2)
+camera.position.set(0, 2, 3)
 
 const canvas = document.querySelector("canvas")!
 
@@ -40,9 +41,9 @@ const galaxyMaterial = new RawShaderMaterial({
   uniforms: {
     uSize: { value: 2 },
     uBranches: { value: 2 },
-    uRadius: { value: 1 },
-    uSpin: { value: Math.round(Math.PI * 2 * 100) / 100 },
-    uRandomness: { value: 0.38 },
+    uRadius: { value: 0 },
+    uSpin: { value: Math.PI * 0.25 }, // Math.round(Math.PI * 2 * 100) / 100 },
+    uRandomness: { value: 0 },
     uAlphaMap: { value: alphaMap },
     uColorInn: { value: [ ci.r, ci.g, ci.b ] },
     uColorOut: { value: [ co.r, co.g, co.b ] },
@@ -81,13 +82,13 @@ void main() {
   float mt = mix(st, qt, p.x);
 
   float branchOffset = (PI2 / uBranches) * floor(seed.x * uBranches);
-  float angle = qt * uSpin * (2.0 - sqrt(sqrt(1.0 - qt * qt)));
+  float angle = qt * uSpin * (2.0 - sqrt(1.0 - qt));
   vec3 temp = p;
   p.x = position.x * cos(angle + branchOffset) * uRadius;
   p.z = position.x * sin(angle + branchOffset) * uRadius;
 
   p += rough3D(seed) * random(seed.zx) * uRandomness * mt;
-  p.y *= 0.333 + qt * 0.667;
+  p.y *= 0.5 + qt * 0.5;
 
   vDistance = mt;
 
@@ -248,12 +249,12 @@ coreGeometry.setAttribute("size", new BufferAttribute(coreSizes, 1))
 
 // Meshes
 
-const branchStars = new Points(galaxyGeometry, galaxyMaterial)
-branchStars.material.onBeforeCompile = (shader) => {
+const galaxyStars = new Points(galaxyGeometry, galaxyMaterial)
+galaxyStars.material.onBeforeCompile = (shader) => {
   shader.vertexShader = shader.vertexShader
   .replace("#include rough3D", shaderUtilRough3D)
 }
-scene.add(branchStars)
+scene.add(galaxyStars)
 
 const coreStars = new Points(coreGeometry, coreMaterial)
 coreStars.material.onBeforeCompile = (shader) => {
@@ -269,7 +270,7 @@ scene.add(coreStars)
 gui.add(galaxyMaterial.uniforms.uSize, "value", 0.1, 4, 0.01).name("size")
 .onChange((size: number) => coreMaterial.uniforms.uSize.value = size)
 gui.add(galaxyMaterial.uniforms.uBranches, "value", 1, 5, 1).name("branches")
-gui.add(galaxyMaterial.uniforms.uRadius, "value", 0.01, 5, 0.01).name("radius")
+gui.add(galaxyMaterial.uniforms.uRadius, "value", 0, 5, 0.01).name("radius")
 .onChange((radius: number) => coreMaterial.uniforms.uRadius.value = radius)
 gui.add(galaxyMaterial.uniforms.uSpin, "value", -Math.PI * 4, Math.PI * 4, 0.01).name("spin")
 gui.add(galaxyMaterial.uniforms.uRandomness, "value", 0, 1, 0.01).name("randomness")
@@ -286,9 +287,44 @@ gui.addColor(color, "out").name("out color")
 
 
 
+// Animation
+
+const animate = {
+  radius: galaxyMaterial.uniforms.uRadius.value,
+  spin: galaxyMaterial.uniforms.uSpin.value,
+  randomness: galaxyMaterial.uniforms.uRandomness.value,
+  rotate: 0,
+}
+
+const tween = new TWEEN.Tween(animate).to({
+  radius: 2,
+  spin: Math.PI * 4,
+  randomness: 0.618,
+  rotate: Math.PI * 4,
+})
+
+.duration(8000)
+.easing(TWEEN.Easing.Quartic.InOut)
+.repeat(Infinity)
+.repeatDelay(1000)
+.yoyo(true)
+.onUpdate(({ radius, spin, randomness, rotate }) => {
+  galaxyMaterial.uniforms.uRadius.value = radius
+  galaxyMaterial.uniforms.uSpin.value = spin
+  galaxyMaterial.uniforms.uRandomness.value = randomness
+  galaxyStars.rotation.y = rotate
+  coreStars.rotation.y = rotate / 2
+
+  coreMaterial.uniforms.uRadius.value = radius
+})
+.start()
+
+
+
 // Looper
 
 export const play = () => {
+  TWEEN.update()
   orbit.update()
   renderer.render(scene, camera)
   requestAnimationFrame(play)
