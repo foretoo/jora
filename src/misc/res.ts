@@ -1,5 +1,6 @@
 import { BufferAttribute, BufferGeometry, CanvasTexture, PerspectiveCamera, Points, RawShaderMaterial, Scene, TextureLoader, Vector4, WebGLRenderer } from "three"
 import { GPUComputationRenderer } from "three/examples/jsm/misc/GPUComputationRenderer"
+import { camera, renderer, scene } from "../init"
 
 
 
@@ -11,7 +12,7 @@ const HEIGHT = 300
 const ASPECT = WIDTH / HEIGHT
 const AMOUNT = WIDTH * HEIGHT
 const PR = Math.min(devicePixelRatio, 2)
-const imgsrc = "../../public/rachel.jpg"
+const imgsrc = "rachel.jpg"
 let pointSizeScale = Math.min(innerWidth, innerHeight) / 201
 
 
@@ -19,21 +20,11 @@ let pointSizeScale = Math.min(innerWidth, innerHeight) / 201
 // ------------------------ //
 // SETUP
 
-const scene = new Scene()
-
-const camera = new PerspectiveCamera(
-  60, innerWidth / innerHeight, 0.1, 100
-)
 camera.position.set(0, 0, 5)
 
 const f = Math.tan((camera.fov * Math.PI) / 360)
 let originYScale = f * camera.position.distanceTo(scene.position)
 let originXScale = originYScale * camera.aspect
-
-const renderer = new WebGLRenderer()
-renderer.setSize(innerWidth, innerHeight)
-renderer.setPixelRatio(PR)
-document.body.append(renderer.domElement)
 
 const loader = new TextureLoader()
 const image = loader.load(imgsrc)
@@ -321,8 +312,6 @@ const computeResponse = () => {
 export const play = () => {
   dampPointer()
   points.material.uniforms.positionTexture.value = computeResponse()
-  renderer.render(scene, camera)
-  requestAnimationFrame(play)
 }
 
 
@@ -331,8 +320,5 @@ export const play = () => {
 // HELPERS
 
 addEventListener("resize", () => {
-  camera.aspect = innerWidth / innerHeight
-  camera.updateProjectionMatrix()
   originXScale = originYScale * camera.aspect
-  renderer.setSize(innerWidth, innerHeight)  
 })
