@@ -1,5 +1,5 @@
 import "./style.sass"
-// import { loop } from "./init"
-import { play } from "./misc/fbo"
+import { loop } from "./init"
+import { play } from "./classic/17-house"
 
-requestAnimationFrame(play)
+loop(play)
