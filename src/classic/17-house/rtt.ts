@@ -1,5 +1,5 @@
-import { Mesh, NearestFilter, OrthographicCamera, PlaneBufferGeometry, Scene, ShaderMaterial, WebGLRenderer, WebGLRenderTarget } from "three";
-import { renderer } from "../../init";
+import { Mesh, NearestFilter, OrthographicCamera, PlaneBufferGeometry, Scene, ShaderMaterial, WebGLRenderTarget } from "three"
+import { renderer } from "../../init"
 import snoise2D from "./snoise2D.glsl"
 
 const scene = new Scene()

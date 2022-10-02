@@ -1,6 +1,5 @@
-import { BufferAttribute } from "three/src/core/BufferAttribute"
-import { BufferGeometry } from "three/src/core/BufferGeometry"
-import { PolyhedronGeometry } from "three/src/geometries/PolyhedronGeometry"
+import { BufferAttribute, BufferGeometry, PolyhedronGeometry } from "three"
+
 
 const octo_vertices = [
   0, 0, -1,    1, 0, 0,    0, 0, 1,    -1, 0, 0,    0, 1, 0,

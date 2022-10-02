@@ -1,6 +1,6 @@
-import { scene, camera, renderer, orbit } from "../../init"
-import * as dat from "dat.gui"
 import { AmbientLight, CameraHelper, DirectionalLight, DirectionalLightHelper, Fog, GridHelper, Mesh, MeshStandardMaterial, PCFSoftShadowMap, PlaneBufferGeometry, Vector2 } from "three"
+import GUI from "three/examples/jsm/libs/lil-gui.module.min.js"
+import { scene, camera, renderer, orbit } from "../../init"
 import { rttAlpha, rttColor } from "./rtt"
 import { initFellas } from "./fellas"
 import { updateFlies } from "./flies"
@@ -8,7 +8,7 @@ import { initIgloo } from "./igloo"
 
 
 
-const gui = new dat.GUI()
+const gui = new GUI()
 camera.position.set(2, 5, 8)
 
 renderer.shadowMap.enabled = true
