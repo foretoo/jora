@@ -5,7 +5,6 @@ import { TWEEN } from "three/examples/jsm/libs/tween.module.min.js"
 
 
 
-console.clear()
 // ------------------------ //
 // SETUP
 
