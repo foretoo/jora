@@ -1,6 +1,7 @@
-import { BufferAttribute, BufferGeometry, CanvasTexture, PerspectiveCamera, Points, RawShaderMaterial, Scene, TextureLoader, Vector4, WebGLRenderer } from "three"
+import { BufferAttribute, BufferGeometry, CanvasTexture, Points, RawShaderMaterial, TextureLoader, Vector4 } from "three"
 import { GPUComputationRenderer } from "three/examples/jsm/misc/GPUComputationRenderer"
 import { camera, renderer, scene } from "../init"
+import { TWEEN } from "three/examples/jsm/libs/tween.module.min"
 
 
 
@@ -36,8 +37,8 @@ const gpu = new GPUComputationRenderer(WIDTH, HEIGHT, renderer)
 // ------------------------ //
 // POINTER
 
-const pointer = new Vector4(0,0,1,0)
-const prevPointer = new Vector4(0,0,1,0)
+const pointer = new Vector4(0,0,0,0)
+const prevPointer = new Vector4(0,0,0,0)
 
 addEventListener("pointermove", (e) => {
   prevPointer.copy(pointer)
@@ -48,9 +49,20 @@ addEventListener("pointermove", (e) => {
   const [ dx, dy ] = [ pointer.x - prevPointer.x, pointer.y - prevPointer.y ]
   pointer.w += Math.sqrt(dx * dx + dy * dy)
 
+  if (tween.isPlaying()) tween.stop()
+
   points.rotation.y =  pointer.x / 34
   points.rotation.x = -pointer.y / 34
 })
+
+const rotateBack = () => {
+  if (tween.isPlaying()) return
+  tween.start()
+}
+
+renderer.domElement.addEventListener("pointerleave", rotateBack)
+renderer.domElement.addEventListener("pointerup", rotateBack)
+renderer.domElement.addEventListener("pointercancel", rotateBack)
 
 const dampPointer = () => pointer.w *= 0.9
 
@@ -309,7 +321,12 @@ const computeResponse = () => {
 // ------------------------ //
 // LOOPER
 
+const tween = new TWEEN.Tween(points.rotation)
+.to({ x: 0, y: 0 }, 1000)
+.easing(TWEEN.Easing.Cubic.InOut)
+
 export const play = () => {
+  TWEEN.update()
   dampPointer()
   points.material.uniforms.positionTexture.value = computeResponse()
 }
