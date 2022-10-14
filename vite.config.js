@@ -5,7 +5,7 @@ export default defineConfig({
   publicDir: false,
   plugins: [glsl()],
   server: {
-    open: "/src/index.html",
+    open: "/src/classic/21-scroll/index.html",
     host: true,
   },
   optimizeDeps: {
