@@ -1,4 +1,4 @@
-import { BufferAttribute, Camera, CapsuleBufferGeometry, DoubleSide, Group, InstancedMesh, Mesh, MeshBasicMaterial, MeshMatcapMaterial, MeshNormalMaterial, Object3D, SphereBufferGeometry, StreamDrawUsage, TetrahedronBufferGeometry, TextureLoader, TorusBufferGeometry, TorusKnotBufferGeometry, Vector2 } from "three"
+import { BufferAttribute, Camera, CapsuleBufferGeometry, DoubleSide, Group, InstancedMesh, Mesh, MeshBasicMaterial, MeshMatcapMaterial, MeshNormalMaterial, Object3D, OctahedronBufferGeometry, SphereBufferGeometry, StreamDrawUsage, TetrahedronBufferGeometry, TextureLoader, TorusBufferGeometry, TorusKnotBufferGeometry, Vector2 } from "three"
 import { TWEEN } from "three/examples/jsm/libs/tween.module.min.js"
 import { scene, loop, camera, orbit } from "../../init"
 
@@ -37,8 +37,8 @@ const getMatcapImage = (index: string) => {
     `https://raw.githubusercontent.com/nidorx/matcaps/master/1024/${index}.png`
   )
 }
-const redstone = getMatcapImage("660505_F2B090_DD4D37_AA1914")
-const mythril = getMatcapImage("D0CCCB_524D50_928891_727581")
+const redstone = loader.load("../../../public/textures/matcaps/redstone.png") // getMatcapImage("660505_F2B090_DD4D37_AA1914")
+const mythril = loader.load("../../../public/textures/matcaps/mythril.png") // getMatcapImage("85B9D3_C9EAF9_417277_528789")
 const nanite = loader.load("../../../public/textures/matcaps/normal.png")
 
 const wireframeMaterial = new MeshBasicMaterial({ wireframe: true })
@@ -51,12 +51,32 @@ scene.add(meshes)
 
 //// TORUS
 
-const torusNormGeometry = new TorusBufferGeometry(0.4, 0.2, 32, 128)
-const torusWireGeometry = new TorusBufferGeometry(0.6, 0.3, 3, 256)
+const torusCoreGeometry = new TorusBufferGeometry(0.4, 0.02, 32, 128)
+
+const torusCore = new InstancedMesh(torusCoreGeometry, new MeshMatcapMaterial(), 16)
+
+const a = Math.PI * 2 / torusCore.count
+for (let i = 0; i < torusCore.count; i++) {
+  const angle = i * a
+  const x = 0.2 * Math.cos(angle)
+  const z = 0.2 * Math.sin(angle)
+  gizmo.position.set(x, 0, z)
+  gizmo.rotation.set(0, 0, 0)
+  gizmo.rotateY(-angle)
+  gizmo.rotateX(Math.PI / 3)
+  gizmo.updateMatrix()
+  torusCore.setMatrixAt(i, gizmo.matrix)
+}
+
+torusCore.material.matcap = mythril
+torusCore.material.needsUpdate = true
+torusCore.rotateY(Math.PI / 2)
+
+const torusOrbitGeometry = new TorusBufferGeometry(0.6, 0.3, 3, 256)
 
 {
-  const n = torusWireGeometry.parameters.tubularSegments * 6
-  const a = torusWireGeometry.index!.array as Float32Array
+  const n = torusOrbitGeometry.parameters.tubularSegments * 6
+  const a = torusOrbitGeometry.index!.array as Float32Array
   const w = new Float32Array(a.length / 6)
 
   for (let i = 0; i < w.length; i += 3) {
@@ -66,20 +86,15 @@ const torusWireGeometry = new TorusBufferGeometry(0.6, 0.3, 3, 256)
     w[i + 2] = a[(i6 + n) % a.length]
   }
 
-  torusWireGeometry.setIndex(new BufferAttribute(w, 1))
+  torusOrbitGeometry.setIndex(new BufferAttribute(w, 1))
 }
 
+const torusOrbit = new Mesh(torusOrbitGeometry, wireframeMaterial)
+torusOrbit.scale.set(1.5, 1.5, 0.333)
+
 const torus = new Group()
-const torusOrbit = new Mesh(torusWireGeometry, wireframeMaterial)
-const torusCore = new Mesh(torusNormGeometry, new MeshMatcapMaterial())
-torusCore.material.matcap = mythril
-torusCore.material.needsUpdate = true
-
-torus.add(torusOrbit, torusCore)
+torus.add(torusCore, torusOrbit)
 torus.position.set(distanceX, 0, 0)
-
-torus.children[1].rotateX(Math.PI / 2)
-torus.children[0].scale.set(1.5, 1.5, 0.333)
 torus.rotation.x = torus.rotation.y = -meshRotation
 meshes.add(torus)
 
@@ -87,7 +102,7 @@ meshes.add(torus)
 
 //// CROSS
 
-const capsuleGeometry = new CapsuleBufferGeometry(0.5, 1.5, 6, 36)
+const capsuleGeometry = new SphereBufferGeometry(0.667, 256, 2) // new OctahedronBufferGeometry(0.5, 2) // new CapsuleBufferGeometry(0.5, 1.5, 6, 36)
 const capGeometry = new SphereBufferGeometry(0.62, 3, 48, 0,Math.PI * 2, 0,Math.PI / 2)
 
 {
@@ -122,6 +137,8 @@ crossCapsGroup.children[1].position.y = -0.75
 crossCapsGroup.children[1].rotation.x = Math.PI
 
 const crossCapsule = new Mesh(capsuleGeometry, new MeshMatcapMaterial())
+crossCapsule.scale.y = 2
+crossCapsule.material.flatShading = true
 crossCapsule.material.matcap = redstone
 crossCapsule.material.needsUpdate = true
 
@@ -274,7 +291,7 @@ addEventListener("scroll", () => {
 
   if (currentSection === 0 && !torusTween.isPlaying()) {
     torusTween
-    .to({ y: torus.children[1].rotation.y + Math.PI * 3 })
+    .to({ x: torusCore.rotation.x + Math.PI * 3 })
     .start()
   }
   else if (currentSection === 1 && !crossTween.isPlaying()) {
@@ -298,11 +315,11 @@ addEventListener("resize", () => {
 //// TORUS ANIMATION
 
 const torusTween = new TWEEN
-.Tween(torus.children[1].rotation)
+.Tween(torusCore.rotation)
 .duration(2000)
 .easing(TWEEN.Easing.Cubic.InOut)
-.onUpdate(({ y }) => {
-  torus.children[0].rotation.y = y / 2
+.onUpdate(({ x }) => {
+  torusOrbit.rotation.y = x / 2
 })
 
 //// CROSS ANIMATION
@@ -316,10 +333,13 @@ const crossTween = {
     .yoyo(true)
     .repeatDelay(1000)
     .onUpdate(({ v }) => {
-      const s0 = 1 - v * 0.333
-      crossCapsule.scale.set(s0, s0, s0)
-      const s1 = 1 + v * 0.5
-      crossCapsGroup.scale.set(s1, 1, s1)
+      const sv0 = 2 - v
+      const sh0 = 1 - v * 0.5
+      crossCapsule.scale.set(sh0, sv0, sh0)
+      const s1 = 1 + v
+      crossCapsGroup.scale.set(s1, s1, s1)
+      crossCapsGroup.children[0].position.y =  0.75 - 0.75 * v
+      crossCapsGroup.children[1].position.y = -0.75 + 0.75 * v
     }),
 
   rv: 0,
