@@ -30,10 +30,15 @@
       display: flex;
       justify-content: flex-start;
       align-items: center;
-      font-size: 64px;
+      font-size: 10vw;
     }
     h1:nth-child(even) {
       justify-content: flex-end;
+    }
+    .i {
+      letter-spacing: 0.5vw;
+      font-style: italic;
+      font-weight: normal;
     }
 
   </style>
@@ -42,9 +47,9 @@
 <body>
   <canvas></canvas>
   <section>
-    <h1>Peck-Peck</h1>
-    <h1>Pick-Pick</h1>
-    <h1>Poock-Poock</h1>
+    <h1>M<span class="i">y</span>thril</h1>
+    <h1>Red<span class="i">s</span>tone</h1>
+    <h1>Nan<span class="i">i</span>te</h1>
   </section>
   <script type="module" src="index.ts"></script>
 </body>
