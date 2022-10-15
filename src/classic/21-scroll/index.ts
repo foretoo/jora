@@ -1,4 +1,4 @@
-import { BufferAttribute, Camera, CapsuleBufferGeometry, DoubleSide, Group, InstancedMesh, Mesh, MeshBasicMaterial, MeshNormalMaterial, Object3D, SphereBufferGeometry, StreamDrawUsage, TetrahedronBufferGeometry, TorusBufferGeometry, TorusKnotBufferGeometry, Vector2 } from "three"
+import { BufferAttribute, Camera, CapsuleBufferGeometry, DoubleSide, Group, InstancedMesh, Mesh, MeshBasicMaterial, MeshMatcapMaterial, MeshNormalMaterial, Object3D, SphereBufferGeometry, StreamDrawUsage, TetrahedronBufferGeometry, TextureLoader, TorusBufferGeometry, TorusKnotBufferGeometry, Vector2 } from "three"
 import { TWEEN } from "three/examples/jsm/libs/tween.module.min.js"
 import { scene, loop, camera, orbit } from "../../init"
 
@@ -21,6 +21,25 @@ const cameraPivot = new Group()
 cameraPivot.add(camera)
 camera.position.z = 5
 scene.add(cameraPivot)
+
+const loader = new TextureLoader()
+
+const mt = [
+  "D0CCCB_524D50_928891_727581",
+  "CCF6FA_9DD9EB_82C5D9_ACD4E4",
+]
+const nn = [
+  "161B1F_C7E0EC_90A5B3_7B8C9B",
+  "515151_DCDCDC_B7B7B7_9B9B9B",
+]
+const getMatcapImage = (index: string) => {
+  return loader.load(
+    `https://raw.githubusercontent.com/nidorx/matcaps/master/1024/${index}.png`
+  )
+}
+const redstone = getMatcapImage("660505_F2B090_DD4D37_AA1914")
+const mythril = getMatcapImage("D0CCCB_524D50_928891_727581")
+const nanite = loader.load("../../../public/textures/matcaps/normal.png")
 
 const wireframeMaterial = new MeshBasicMaterial({ wireframe: true })
 const normalMaterial = new MeshNormalMaterial()
@@ -51,10 +70,12 @@ const torusWireGeometry = new TorusBufferGeometry(0.6, 0.3, 3, 256)
 }
 
 const torus = new Group()
-torus.add(
-  new Mesh(torusWireGeometry, wireframeMaterial),
-  new Mesh(torusNormGeometry, normalMaterial)
-)
+const torusOrbit = new Mesh(torusWireGeometry, wireframeMaterial)
+const torusCore = new Mesh(torusNormGeometry, new MeshMatcapMaterial())
+torusCore.material.matcap = mythril
+torusCore.material.needsUpdate = true
+
+torus.add(torusOrbit, torusCore)
 torus.position.set(distanceX, 0, 0)
 
 torus.children[1].rotateX(Math.PI / 2)
@@ -90,19 +111,22 @@ const capGeometry = new SphereBufferGeometry(0.62, 3, 48, 0,Math.PI * 2, 0,Math.
 }
 
 const cross = new Group()
-const crossCaps = new Group()
-crossCaps.add(
+const crossCapsGroup = new Group()
+
+crossCapsGroup.add(
   new Mesh(capGeometry, wireframeMaterial),
   new Mesh(capGeometry, wireframeMaterial),
 )
-cross.add(
-  new Mesh(capsuleGeometry, normalMaterial),
-  crossCaps,
-)
+crossCapsGroup.children[0].position.y = 0.75
+crossCapsGroup.children[1].position.y = -0.75
+crossCapsGroup.children[1].rotation.x = Math.PI
+
+const crossCapsule = new Mesh(capsuleGeometry, new MeshMatcapMaterial())
+crossCapsule.material.matcap = redstone
+crossCapsule.material.needsUpdate = true
+
+cross.add(crossCapsule, crossCapsGroup)
 cross.position.set(-distanceX, distanceY, 0)
-crossCaps.children[0].position.y = 0.75
-crossCaps.children[1].position.y = -0.75
-crossCaps.children[1].rotation.x = Math.PI
 
 cross.children[1].rotation.z = Math.PI / 2
 cross.rotation.z = cross.rotation.x = meshRotation
@@ -114,7 +138,7 @@ meshes.add(cross)
 
 const p = 3, q = 1
 
-const knotNormGeometry = new TorusKnotBufferGeometry(1, 0.125, 256, 24, p, q)
+const knotNormGeometry = new TorusKnotBufferGeometry(1, 0.125, 256, 15, p, q)
 const knotWireGeometry = new TorusKnotBufferGeometry(1, 0.1875, 768, 3, p, q)
 
 {
@@ -133,11 +157,12 @@ const knotWireGeometry = new TorusKnotBufferGeometry(1, 0.1875, 768, 3, p, q)
 }
 
 const knot = new Group()
-knot.add(
-  new Mesh(knotNormGeometry, normalMaterial),
-  new Mesh(knotWireGeometry, wireframeMaterial),
-);
-((knot.children[0] as Mesh).material as MeshNormalMaterial).side = DoubleSide
+const knotBody = new Mesh(knotNormGeometry, new MeshMatcapMaterial({ flatShading: true }))
+knotBody.material.side = DoubleSide
+knotBody.material.matcap = nanite
+knotBody.material.needsUpdate = true
+const knotFrame = new Mesh(knotWireGeometry, wireframeMaterial)
+knot.add(knotBody, knotFrame)
 knot.position.set(distanceX, distanceY * 2, 0)
 
 knot.rotation.x = knot.rotation.z = meshRotation
@@ -231,12 +256,18 @@ function setMeshesPosition() {
   meshes.rotation.y = y * Math.PI * 2
 }
 
-let currentSection = Math.round(scrollY / innerHeight)
+let currentSection: number | null = Math.round(scrollY / innerHeight)
 addEventListener("scroll", () => {
   setMeshesPosition()
 
-  const newSection = Math.round(scrollY / innerHeight)
-  if (currentSection === newSection) return
+  const newSection =
+    (scrollY / innerHeight <= 0.2) ? 0 :
+    (scrollY / innerHeight <= 1.2 &&
+     scrollY / innerHeight >= 0.8) ? 1 :
+    (scrollY / innerHeight >= 1.8) ? 2 :
+    null
+  
+  if (newSection === null || currentSection === newSection) return
   currentSection = newSection
 
 
@@ -261,6 +292,7 @@ addEventListener("resize", () => {
   torus.position.x = distanceX
   cross.position.x = distanceX
   knot.position.x = distanceX
+  setMeshesPosition()
 })
 
 //// TORUS ANIMATION
@@ -276,57 +308,43 @@ const torusTween = new TWEEN
 //// CROSS ANIMATION
 
 const crossTween = {
-  capsuleScale: new TWEEN
-  .Tween(cross.children[0].scale)
-  .duration(500)
-  .easing(TWEEN.Easing.Cubic.InOut)
-  .yoyo(true)
-  .repeatDelay(1000),
 
-  capScale: new TWEEN
-  .Tween(cross.children[1].scale)
-  .duration(500)
-  .easing(TWEEN.Easing.Cubic.InOut)
-  .yoyo(true)
-  .repeatDelay(1000),
+  scale: new TWEEN
+    .Tween({ v: 0 })
+    .duration(500)
+    .easing(TWEEN.Easing.Cubic.InOut)
+    .yoyo(true)
+    .repeatDelay(1000)
+    .onUpdate(({ v }) => {
+      const s0 = 1 - v * 0.333
+      crossCapsule.scale.set(s0, s0, s0)
+      const s1 = 1 + v * 0.5
+      crossCapsGroup.scale.set(s1, 1, s1)
+    }),
 
-  capsuleRotation: new TWEEN
-  .Tween(cross.children[0].rotation)
-  .duration(1500)
-  .easing(TWEEN.Easing.Cubic.InOut)
-  .delay(250),
-
-  capRotation: new TWEEN
-  .Tween(cross.children[1].rotation)
-  .duration(1500)
-  .easing(TWEEN.Easing.Cubic.InOut)
-  .delay(250),
+  rv: 0,
+  rotation: new TWEEN
+    .Tween({ v: 0 })
+    .duration(1800)
+    .easing(TWEEN.Easing.Cubic.InOut)
+    .delay(100)
+    .onUpdate(({ v }) => {
+      const dr = (v - crossTween.rv) * Math.PI * 2
+      crossCapsule.rotation.x += dr
+      crossCapsGroup.rotation.y += dr
+      crossTween.rv = v
+    })
+    .onComplete((tween) => tween.v = 0),
 
   start: () => {
-    crossTween.capsuleScale
-      .to({ x: 0.75, y: 0.75, z: 0.75 })
-      .repeat(1)
-      .start()
-    crossTween.capScale
-      .to({ x: 1.333, y: 1.333, z: 1.333 })
-      .repeat(1)
-      .start()
-    crossTween.capsuleRotation
-      .to({ x: cross.children[0].rotation.x + Math.PI * 2 })
-      .start()
-    crossTween.capRotation
-      .to({ y: cross.children[1].rotation.y + Math.PI * 2 })
-      .start()
+    crossTween.scale.to({ v: 1 }).repeat(1).start()
+    crossTween.rotation.to({ v: 1 }).start()
   },
 
-  isPlaying: () => {
-    return (
-      crossTween.capsuleScale.isPlaying() ||
-      crossTween.capScale.isPlaying() ||
-      crossTween.capsuleRotation.isPlaying() ||
-      crossTween.capRotation.isPlaying()
-    )
-  }
+  isPlaying: () => (
+    crossTween.scale.isPlaying() ||
+    crossTween.rotation.isPlaying()
+  )
 }
 
 //// KNOT ANIMATION
@@ -335,3 +353,10 @@ const knotTween = new TWEEN
 .Tween(knot.rotation)
 .duration(2000)
 .easing(TWEEN.Easing.Cubic.InOut)
+
+
+
+//// TITLES
+
+const titles = document.querySelectorAll("h1")
+console.log(titles)
