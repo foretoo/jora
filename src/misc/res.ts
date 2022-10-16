@@ -13,7 +13,7 @@ const HEIGHT = 300
 const ASPECT = WIDTH / HEIGHT
 const AMOUNT = WIDTH * HEIGHT
 const PR = Math.min(devicePixelRatio, 2)
-const imgsrc = "rachel.jpg"
+const imgsrc = "assets/rachel.jpg"
 let pointSizeScale = Math.min(innerWidth, innerHeight) / 201
 
 
