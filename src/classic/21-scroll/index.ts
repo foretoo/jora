@@ -1,4 +1,4 @@
-import { BufferAttribute, Camera, CapsuleBufferGeometry, DoubleSide, Group, InstancedMesh, Mesh, MeshBasicMaterial, MeshMatcapMaterial, MeshNormalMaterial, Object3D, OctahedronBufferGeometry, SphereBufferGeometry, StreamDrawUsage, TetrahedronBufferGeometry, TextureLoader, TorusBufferGeometry, TorusKnotBufferGeometry, Vector2 } from "three"
+import { BufferAttribute, Camera, DoubleSide, Group, InstancedMesh, Mesh, MeshBasicMaterial, MeshMatcapMaterial, Object3D, SphereBufferGeometry, TetrahedronBufferGeometry, TextureLoader, TorusBufferGeometry, TorusKnotBufferGeometry, Vector2 } from "three"
 import { TWEEN } from "three/examples/jsm/libs/tween.module.min.js"
 import { scene, loop, camera, orbit } from "../../init"
 
@@ -24,25 +24,11 @@ scene.add(cameraPivot)
 
 const loader = new TextureLoader()
 
-const mt = [
-  "D0CCCB_524D50_928891_727581",
-  "CCF6FA_9DD9EB_82C5D9_ACD4E4",
-]
-const nn = [
-  "161B1F_C7E0EC_90A5B3_7B8C9B",
-  "515151_DCDCDC_B7B7B7_9B9B9B",
-]
-const getMatcapImage = (index: string) => {
-  return loader.load(
-    `https://raw.githubusercontent.com/nidorx/matcaps/master/1024/${index}.png`
-  )
-}
-const redstone = loader.load("../../../public/textures/matcaps/redstone.png") // getMatcapImage("660505_F2B090_DD4D37_AA1914")
-const mythril = loader.load("../../../public/textures/matcaps/mythril.png") // getMatcapImage("85B9D3_C9EAF9_417277_528789")
-const nanite = loader.load("../../../public/textures/matcaps/normal.png")
+const redstone = loader.load("../../../public/textures/matcaps/redstone.png")
+const mythril = loader.load("../../../public/textures/matcaps/mythril.png")
+const nanite = loader.load("../../../public/textures/matcaps/nanite.png")
 
 const wireframeMaterial = new MeshBasicMaterial({ wireframe: true })
-const normalMaterial = new MeshNormalMaterial()
 
 const meshes = new Group()
 scene.add(meshes)
@@ -51,7 +37,7 @@ scene.add(meshes)
 
 //// TORUS
 
-const torusCoreGeometry = new TorusBufferGeometry(0.4, 0.02, 32, 128)
+const torusCoreGeometry = new TorusBufferGeometry(0.5, 0.033, 18, 96)
 
 const torusCore = new InstancedMesh(torusCoreGeometry, new MeshMatcapMaterial(), 16)
 
@@ -72,7 +58,7 @@ torusCore.material.matcap = mythril
 torusCore.material.needsUpdate = true
 torusCore.rotateY(Math.PI / 2)
 
-const torusOrbitGeometry = new TorusBufferGeometry(0.6, 0.3, 3, 256)
+const torusOrbitGeometry = new TorusBufferGeometry(0.75, 0.3, 3, 256)
 
 {
   const n = torusOrbitGeometry.parameters.tubularSegments * 6
@@ -102,7 +88,7 @@ meshes.add(torus)
 
 //// CROSS
 
-const capsuleGeometry = new SphereBufferGeometry(0.667, 256, 2) // new OctahedronBufferGeometry(0.5, 2) // new CapsuleBufferGeometry(0.5, 1.5, 6, 36)
+const capsuleGeometry = new SphereBufferGeometry(0.667, 144, 2)
 const capGeometry = new SphereBufferGeometry(0.62, 3, 48, 0,Math.PI * 2, 0,Math.PI / 2)
 
 {
@@ -155,7 +141,7 @@ meshes.add(cross)
 
 const p = 3, q = 1
 
-const knotNormGeometry = new TorusKnotBufferGeometry(1, 0.125, 256, 15, p, q)
+const knotNormGeometry = new TorusKnotBufferGeometry(1, 0.125, 256, 18, p, q)
 const knotWireGeometry = new TorusKnotBufferGeometry(1, 0.1875, 768, 3, p, q)
 
 {
@@ -174,8 +160,9 @@ const knotWireGeometry = new TorusKnotBufferGeometry(1, 0.1875, 768, 3, p, q)
 }
 
 const knot = new Group()
-const knotBody = new Mesh(knotNormGeometry, new MeshMatcapMaterial({ flatShading: true }))
+const knotBody = new Mesh(knotNormGeometry, new MeshMatcapMaterial())
 knotBody.material.side = DoubleSide
+knotBody.material.flatShading = true
 knotBody.material.matcap = nanite
 knotBody.material.needsUpdate = true
 const knotFrame = new Mesh(knotWireGeometry, wireframeMaterial)
