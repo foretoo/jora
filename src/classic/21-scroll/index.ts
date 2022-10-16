@@ -24,9 +24,9 @@ scene.add(cameraPivot)
 
 const loader = new TextureLoader()
 
-const redstone = loader.load("../../../public/textures/matcaps/redstone.png")
-const mythril = loader.load("../../../public/textures/matcaps/mythril.png")
-const nanite = loader.load("../../../public/textures/matcaps/nanite.png")
+const redstone = loader.load("../../assets/redstone.png")
+const mythril = loader.load("../../assets/mythril.png")
+const nanite = loader.load("../../assets/nanite.png")
 
 const wireframeMaterial = new MeshBasicMaterial({ wireframe: true })
 
