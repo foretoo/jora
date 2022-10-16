@@ -1,5 +1,5 @@
 import "./style.css"
-import { BufferAttribute, Cache, Camera, DoubleSide, Group, InstancedMesh, Mesh, MeshBasicMaterial, MeshMatcapMaterial, Object3D, SphereBufferGeometry, TetrahedronBufferGeometry, Texture, TextureLoader, TorusBufferGeometry, TorusKnotBufferGeometry, Vector2 } from "three"
+import { BufferAttribute, Camera, DoubleSide, Group, InstancedMesh, Mesh, MeshBasicMaterial, MeshMatcapMaterial, Object3D, SphereBufferGeometry, TetrahedronBufferGeometry, Texture, TextureLoader, TorusBufferGeometry, TorusKnotBufferGeometry, Vector2 } from "three"
 import { TWEEN } from "three/examples/jsm/libs/tween.module.min.js"
 import { scene, loop, camera, orbit } from "../../init"
 
@@ -26,7 +26,6 @@ const amount = 256
 const gizmo = new Object3D()
 
 const loader = new TextureLoader()
-Cache.enabled = true
 
 const wireframeMaterial = new MeshBasicMaterial({ wireframe: true })
 
@@ -262,20 +261,16 @@ function loadTexture(
   name: string,
   material: MeshMatcapMaterial,
 ) {
-  material.matcap = Cache.get(name)
-  if (!material.matcap) {
-    const load = () => loader.load(
-      "https://raw.githubusercontent.com/foretoo/jora/main/src/assets/" + name + ".png",
-      (texture: Texture) => {
-        material.matcap = texture
-        material.needsUpdate = true
-        Cache.add(name, material.matcap)
-      },
-      undefined,
-      load
-    )
-    load()
-  }
+  const load = () => loader.load(
+    "https://raw.githubusercontent.com/foretoo/jora/main/src/assets/" + name + ".png",
+    (texture: Texture) => {
+      material.matcap = texture
+      material.needsUpdate = true
+    },
+    undefined,
+    load
+  )
+  load()
 }
 
 
