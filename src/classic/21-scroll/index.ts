@@ -1,4 +1,5 @@
-import { BufferAttribute, Camera, DoubleSide, Group, InstancedMesh, Mesh, MeshBasicMaterial, MeshMatcapMaterial, Object3D, SphereBufferGeometry, TetrahedronBufferGeometry, TextureLoader, TorusBufferGeometry, TorusKnotBufferGeometry, Vector2 } from "three"
+import "./style.css"
+import { BufferAttribute, Cache, Camera, DoubleSide, Group, InstancedMesh, Mesh, MeshBasicMaterial, MeshMatcapMaterial, Object3D, SphereBufferGeometry, TetrahedronBufferGeometry, Texture, TextureLoader, TorusBufferGeometry, TorusKnotBufferGeometry, Vector2 } from "three"
 import { TWEEN } from "three/examples/jsm/libs/tween.module.min.js"
 import { scene, loop, camera, orbit } from "../../init"
 
@@ -6,27 +7,26 @@ import { scene, loop, camera, orbit } from "../../init"
 
 //// SETUP
 
-let distanceY = -10
-let distanceX = innerWidth / innerHeight
-let pointerDamp = 0.062
-let meshRotation = Math.PI / 4
+const main = document.querySelector("main")!
 
 orbit.domElement = null!
 orbit.object = new Object3D() as Camera
-
-const amount = 256
-const gizmo = new Object3D()
 
 const cameraPivot = new Group()
 cameraPivot.add(camera)
 camera.position.z = 5
 scene.add(cameraPivot)
 
-const loader = new TextureLoader()
+let distanceY = -10
+let distanceX = innerWidth / innerHeight
+let pointerDamp = 0.062
+let meshRotation = Math.PI / 4
 
-const redstone = loader.load("../../assets/redstone.png")
-const mythril = loader.load("../../assets/mythril.png")
-const nanite = loader.load("../../assets/nanite.png")
+const amount = 256
+const gizmo = new Object3D()
+
+const loader = new TextureLoader()
+Cache.enabled = true
 
 const wireframeMaterial = new MeshBasicMaterial({ wireframe: true })
 
@@ -54,8 +54,7 @@ for (let i = 0; i < torusCore.count; i++) {
   torusCore.setMatrixAt(i, gizmo.matrix)
 }
 
-torusCore.material.matcap = mythril
-torusCore.material.needsUpdate = true
+loadTexture("mythril", torusCore.material)
 torusCore.rotateY(Math.PI / 2)
 
 const torusOrbitGeometry = new TorusBufferGeometry(0.75, 0.3, 3, 256)
@@ -125,8 +124,7 @@ crossCapsGroup.children[1].rotation.x = Math.PI
 const crossCapsule = new Mesh(capsuleGeometry, new MeshMatcapMaterial())
 crossCapsule.scale.y = 2
 crossCapsule.material.flatShading = true
-crossCapsule.material.matcap = redstone
-crossCapsule.material.needsUpdate = true
+loadTexture("redstone", crossCapsule.material)
 
 cross.add(crossCapsule, crossCapsGroup)
 cross.position.set(-distanceX, distanceY, 0)
@@ -163,8 +161,8 @@ const knot = new Group()
 const knotBody = new Mesh(knotNormGeometry, new MeshMatcapMaterial())
 knotBody.material.side = DoubleSide
 knotBody.material.flatShading = true
-knotBody.material.matcap = nanite
-knotBody.material.needsUpdate = true
+loadTexture("nanite", knotBody.material)
+
 const knotFrame = new Mesh(knotWireGeometry, wireframeMaterial)
 knot.add(knotBody, knotFrame)
 knot.position.set(distanceX, distanceY * 2, 0)
@@ -255,26 +253,49 @@ loop((time) => {
 //// UTILS
 
 function setMeshesPosition() {
-  const y = -scrollY / innerHeight
+  const y = -main.scrollTop / innerHeight
   meshes.position.y = y * distanceY
   meshes.rotation.y = y * Math.PI * 2
 }
 
-let currentSection: number | null = Math.round(scrollY / innerHeight)
-addEventListener("scroll", () => {
+function loadTexture(
+  name: string,
+  material: MeshMatcapMaterial,
+) {
+  material.matcap = Cache.get(name)
+  if (!material.matcap) {
+    const load = () => loader.load(
+      "https://raw.githubusercontent.com/foretoo/jora/main/src/assets/" + name + ".png",
+      (texture: Texture) => {
+        material.matcap = texture
+        material.needsUpdate = true
+        Cache.add(name, material.matcap)
+      },
+      undefined,
+      load
+    )
+    load()
+  }
+}
+
+
+
+//// LISTENERS
+
+let currentSection: number | null = Math.round(main.scrollTop / innerHeight)
+main.addEventListener("scroll", (e) => {
+  e.preventDefault()
   setMeshesPosition()
 
   const newSection =
-    (scrollY / innerHeight <= 0.2) ? 0 :
-    (scrollY / innerHeight <= 1.2 &&
-     scrollY / innerHeight >= 0.8) ? 1 :
-    (scrollY / innerHeight >= 1.8) ? 2 :
+    (main.scrollTop / innerHeight <= 0.2) ? 0 :
+    (main.scrollTop / innerHeight <= 1.2 &&
+     main.scrollTop / innerHeight >= 0.8) ? 1 :
+    (main.scrollTop / innerHeight >= 1.8) ? 2 :
     null
   
   if (newSection === null || currentSection === newSection) return
   currentSection = newSection
-
-
 
   if (currentSection === 0 && !torusTween.isPlaying()) {
     torusTween
@@ -298,6 +319,9 @@ addEventListener("resize", () => {
   knot.position.x = distanceX
   setMeshesPosition()
 })
+
+
+
 
 //// TORUS ANIMATION
 
@@ -360,10 +384,3 @@ const knotTween = new TWEEN
 .Tween(knot.rotation)
 .duration(2000)
 .easing(TWEEN.Easing.Cubic.InOut)
-
-
-
-//// TITLES
-
-const titles = document.querySelectorAll("h1")
-console.log(titles)
