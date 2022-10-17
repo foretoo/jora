@@ -5,7 +5,7 @@ export default defineConfig({
   publicDir: false,
   plugins: [glsl()],
   server: {
-    open: "/src/classic/21-scroll/index.html",
+    open: "/src/index.html",
     host: true,
   },
   optimizeDeps: {
@@ -21,5 +21,6 @@ export default defineConfig({
         entryFileNames: "bundle.js",
       },
     },
+    emptyOutDir: false,
   },
 })
