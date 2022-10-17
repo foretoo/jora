@@ -8,7 +8,7 @@
   box-sizing: border-box;
 }
 
-html, body, canvas, main {
+html, body, canvas, main, footer {
   width: 100%;
   height: 100%;
   position: fixed;
@@ -19,6 +19,20 @@ main {
   display: flex;
   flex-direction: column;
   overflow-y: auto;
+}
+
+footer {
+  height: 60px;
+  bottom: 0;
+  padding: 20px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+footer > a {
+  color: #777;
+  text-decoration: none;
 }
 
 section {
