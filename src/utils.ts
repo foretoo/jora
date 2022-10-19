@@ -1,9 +1,10 @@
+const nd = 3
 export const unitGRandom = () => {
   let rand = 0
-  for (var i = 0; i < 8; i++) {
+  for (let i = 0; i < nd; i++) {
     rand += Math.random()
   }
-  return rand / 8
+  return rand / nd
 }
 
 export const gRandom = (
