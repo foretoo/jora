@@ -170,6 +170,12 @@ gui.add({ reset: () => {
   }
 }}, "reset")
 
+const worker = new Worker(
+  new URL("./physics-worker.ts", import.meta.url),
+  { type: "module" }
+)
+worker.postMessage("Hello, worker!")
+
 
 
 //// LOOPER
