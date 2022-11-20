@@ -1,5 +1,5 @@
 import "./style.sass"
 import { loop } from "./init"
-import { play } from "./classic/20-raycaster"
+import { play } from "./advanced/22-physics"
 
 loop(play)
