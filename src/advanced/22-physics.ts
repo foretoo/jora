@@ -2,6 +2,7 @@ import { AmbientLight, BoxBufferGeometry, DirectionalLight, Mesh, MeshBasicMater
 import { Body, Box, ContactEquation, ContactMaterial, Material, Plane, Quaternion, SAPBroadphase, Sphere, Vec3, World } from "cannon-es"
 import GUI from "three/examples/jsm/libs/lil-gui.module.min.js"
 import { camera, scene } from "../init"
+import { clamp, random } from "../utils"
 
 
 
@@ -13,8 +14,6 @@ const aLight = new AmbientLight(0xffffff, 0.2)
 const dLight = new DirectionalLight(0xffffff, 0.8)
 dLight.position.set(3, 5, 0)
 scene.add(aLight, dLight)
-
-const getRandomLength = () => 0.033 + Math.random() * 0.3
 
 const BV = Math.PI * 4 / 3
 
@@ -88,7 +87,7 @@ const createBody = () => {
 const createSphere = (
   position: Vector3
 ) => {
-  const radius = getRandomLength()
+  const radius = random(0.033, 0.3)
   const mass = radius * radius * radius * BV
 
   const shape = new Sphere(radius)
@@ -110,9 +109,9 @@ const createSphere = (
 const createBox = (
   position: Vector3
 ) => {
-  const width = getRandomLength()
-  const height = getRandomLength()
-  const depth = getRandomLength()
+  const width = random(0.033, 0.3)
+  const height = random(0.033, 0.3)
+  const depth = random(0.033, 0.3)
   const mass = width * height * depth
 
   const shape = new Box(new Vec3(width * 0.5, height * 0.5, depth * 0.5))
@@ -196,14 +195,4 @@ export const play = (
     const { x, y, z, w } = world.bodies[i].quaternion
     scene.children[i + 2].quaternion.set(x, y, z, w)
   }}
-}
-
-//// UTILS
-
-function clamp(
-  value: number,
-  min: number,
-  max: number,
-) {
-  return Math.max(Math.min(value, max), min)
 }
