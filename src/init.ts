@@ -1,4 +1,4 @@
-import { PerspectiveCamera, Scene, WebGLRenderer } from "three"
+import { OrthographicCamera, PerspectiveCamera, Scene, WebGLRenderer } from "three"
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
 
 
@@ -13,6 +13,7 @@ const scene = new Scene()
 
 // Camera
 const camera = new PerspectiveCamera(60, innerWidth / innerHeight, 0.1, 100)
+// const camera = new OrthographicCamera(-1, 1, 1, -1, 0.1, 100)
 
 const logs = document.querySelector("#logs")!
 const orbit = new OrbitControls(camera, canvas)
