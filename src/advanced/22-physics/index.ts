@@ -1,8 +1,8 @@
 import { AmbientLight, BoxBufferGeometry, DirectionalLight, Mesh, MeshBasicMaterial, MeshPhongMaterial, PlaneBufferGeometry, SphereBufferGeometry, Vector3 } from "three"
 import { Body, Box, ContactEquation, ContactMaterial, Material, Plane, Quaternion, SAPBroadphase, Sphere, Vec3, World } from "cannon-es"
 import GUI from "three/examples/jsm/libs/lil-gui.module.min.js"
-import { camera, scene } from "../init"
-import { clamp, random } from "../utils"
+import { camera, scene } from "../../init"
+import { clamp, random } from "../../utils"
 
 
 
@@ -143,7 +143,6 @@ const playHitSound = (
     type: "collide",
   }
 ) => {
-
   const impactStrength = collision.contact.getImpactVelocityAlongNormal()
   if (impactStrength < 1) return
 
@@ -168,12 +167,6 @@ gui.add({ reset: () => {
     world.removeBody(world.bodies[world.bodies.length - 1])
   }
 }}, "reset")
-
-const worker = new Worker(
-  new URL("./physics-worker.ts", import.meta.url),
-  { type: "module" }
-)
-worker.postMessage("Hello, worker!")
 
 
 
