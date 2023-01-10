@@ -12,8 +12,9 @@ const scene = new Scene()
 
 
 // Camera
-const camera = new PerspectiveCamera(60, innerWidth / innerHeight, 0.1, 100)
-// const camera = new OrthographicCamera(-1, 1, 1, -1, 0.1, 100)
+let aspect = innerWidth / innerHeight
+const camera = new PerspectiveCamera(60, aspect, 0.1, 100)
+// const camera = new OrthographicCamera(-aspect, aspect, 1, -1, 0.1, 100)
 
 const logs = document.querySelector("#logs")!
 const orbit = new OrbitControls(camera, canvas)
@@ -34,7 +35,10 @@ renderer.setSize(innerWidth, innerHeight)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
 addEventListener("resize", () => {
-  camera.aspect = innerWidth / innerHeight
+  aspect = innerWidth / innerHeight
+  camera.aspect = aspect
+  // camera.left  = -aspect
+  // camera.right =  aspect
   camera.updateProjectionMatrix()
 
   renderer.setSize(innerWidth, innerHeight)  
