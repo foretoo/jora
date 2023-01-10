@@ -1,5 +1,5 @@
-import { Body, ContactMaterial, Material, Plane, Quaternion, SAPBroadphase, Trimesh, Vec3, World } from "cannon-es"
-import { random } from "../../utils"
+import { Body, ContactMaterial, ConvexPolyhedron, Material, Plane, Quaternion, SAPBroadphase, Trimesh, Vec3, World } from "cannon-es"
+import { getRandomBallPoint, random } from "../../utils"
 import { IData, N, tetrahedronIndices, tetrahedronVertices, timeStep } from "./constants"
 
 declare const self: Worker
@@ -20,8 +20,8 @@ const defaultContactMaterial = new ContactMaterial(
   defaultMaterial,
   defaultMaterial,
   {
-    friction: 0.01,
-    restitution: 0.62,
+    friction: 0.618,
+    restitution: 0.382,
   }
 )
 world.defaultContactMaterial = defaultContactMaterial
@@ -33,12 +33,32 @@ world.defaultContactMaterial = defaultContactMaterial
  */
 
 const bodies: Body[] = []
-const tetrahedronShape = new Trimesh(tetrahedronVertices, tetrahedronIndices)
+const faces: number[][] = []
+const vertices: Vec3[] = []
+
+for (let i = 0; i < tetrahedronIndices.length / 3; i++) {
+  faces.push([
+    tetrahedronIndices[i * 3 + 0],
+    tetrahedronIndices[i * 3 + 1],
+    tetrahedronIndices[i * 3 + 2],
+  ])
+}
+for (let i = 0; i < tetrahedronVertices.length / 3; i++) {
+  vertices.push(new Vec3(
+    tetrahedronVertices[i * 3 + 0],
+    tetrahedronVertices[i * 3 + 1],
+    tetrahedronVertices[i * 3 + 2],
+  ))
+}
+
+const tetrahedronShape = new ConvexPolyhedron({ vertices, faces })
 
 for (let i = 0; i < N; i++) {
   const body = new Body({ mass: 1 })
   body.addShape(tetrahedronShape)
   body.quaternion.setFromEuler(random(Math.PI), random(Math.PI), random(Math.PI)).normalize()
+  const { x, y, z } = getRandomBallPoint()
+  body.position.set(x, y, z)
   bodies.push(body)
   world.addBody(body)
 }
@@ -54,7 +74,7 @@ container.angularVelocity.set(
   Math.random() - 0.5,
   Math.random() - 0.5,
   Math.random() - 0.5,
-)
+).normalize()
 
 const
   widthSegments = 6,

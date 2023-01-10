@@ -1,9 +1,9 @@
 export type IData = Float32Array
 
-export const N = 1
+export const N = 69
 export const timeStep = 1 / 60
 
-const SCALE = 0.1
+export const SCALE = 0.1618
 export const tetrahedronVertices = [
   1, 1, 1,   -1, -1, 1,   -1, 1, -1,   1, -1, -1
 ].map((v) => v * SCALE)

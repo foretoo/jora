@@ -1,12 +1,18 @@
-import { AmbientLight, BufferAttribute, BufferGeometry, DirectionalLight, Euler, Group, InstancedMesh, Mesh, MeshBasicMaterial, MeshPhongMaterial, Object3D, PlaneBufferGeometry } from "three"
-import { camera, scene } from "../../init";
-import { IData, N, tetrahedronIndices, tetrahedronVertices, timeStep } from "./constants";
+import { AmbientLight, BufferAttribute, BufferGeometry, DirectionalLight, Euler, Group, InstancedMesh, Matrix4, Mesh, MeshBasicMaterial, MeshPhongMaterial, Object3D, PlaneBufferGeometry, Quaternion, TetrahedronBufferGeometry, Vector3 } from "three"
+import Stats from "three/examples/jsm/libs/stats.module.js"
+import { camera, scene } from "../../init"
+import { IData, N, tetrahedronIndices, tetrahedronVertices, timeStep } from "./constants"
 
 
 
 /**
  * SETUP
  */
+
+const stats = Stats()
+stats.dom.style.left = "auto"
+stats.dom.style.right = "0"
+document.body.append(stats.dom)
 
 let data: IData = new Float32Array((N + 1) * 7)
 
@@ -34,8 +40,14 @@ const material = new MeshPhongMaterial({ flatShading: true })
 const meshes = new InstancedMesh(geometry, material, N)
 scene.add(meshes)
 
-const planeGeometry = new PlaneBufferGeometry(0.75, 0.75)
-const planeMaterial = new MeshBasicMaterial({ wireframe: true })
+
+
+/**
+ * CONTAINER
+ */
+
+const tetrahedronGeometry = new TetrahedronBufferGeometry(0.25)
+const tetrahedronMaterial = new MeshBasicMaterial({ wireframe: true })
 const sphereGroup = new Group()
 const
   widthSegments = 6,
@@ -45,15 +57,18 @@ const
 
 for (let wi = 0; wi < widthSegments; wi++) {
   for (let hi = 0; hi < heightSegments; hi++) {
-    const mesh = new Mesh(planeGeometry, planeMaterial)
+    const mesh = new Mesh(tetrahedronGeometry, tetrahedronMaterial)
+    const { position, quaternion } = mesh
+
     const wAngle = wi * widthUnitAngle
     const hAngle = heightUnitAngle / 2 + hi * heightUnitAngle
-    mesh.position.set(
-      Math.sin(wAngle) * Math.sin(hAngle),
-      Math.cos(hAngle),
-      Math.cos(wAngle) * Math.sin(hAngle)
-    )
-    mesh.quaternion.setFromEuler(new Euler(hAngle - Math.PI / 2, wAngle, 0, "YXZ"))
+    position.set(Math.sin(wAngle) * Math.sin(hAngle), Math.cos(hAngle), Math.cos(wAngle) * Math.sin(hAngle))
+    quaternion.setFromEuler(new Euler(hAngle - Math.PI / 2, wAngle, 0, "YXZ"))
+
+    mesh.rotateOnAxis(new Vector3(1, -1, 0).normalize(), Math.atan(Math.SQRT2))
+    mesh.applyMatrix4(new Matrix4().makeRotationAxis(position.normalize(), position.y > 0 ? -Math.PI / 12 : Math.PI / 4))
+    mesh.position.multiplyScalar(1.06)
+
     sphereGroup.add(mesh)
   }
 }
@@ -65,10 +80,7 @@ scene.add(sphereGroup)
  * WORKER
  */
 
-const worker = new Worker(
-  new URL("./physics-worker.ts", import.meta.url),
-  { type: "module" }
-)
+const worker = new Worker(new URL("./worker.ts", import.meta.url), { type: "module" })
 
 const requestWorkerData = () => {
   sendTime = performance.now()
@@ -76,6 +88,7 @@ const requestWorkerData = () => {
 }
 
 worker.onmessage = (e: MessageEvent<IData>) => {
+  stats.begin()
   data = e.data
 
   copyData(0, data, sphereGroup)
@@ -89,6 +102,7 @@ worker.onmessage = (e: MessageEvent<IData>) => {
 
   const delay = timeStep * 1000 - (performance.now() - sendTime)
   setTimeout(requestWorkerData, Math.max(delay, 0))
+  stats.end()
 }
 requestWorkerData()
 
