@@ -1,4 +1,4 @@
-import { AmbientLight, BufferAttribute, BufferGeometry, DirectionalLight, Euler, Group, InstancedMesh, Matrix4, Mesh, MeshBasicMaterial, MeshPhongMaterial, Object3D, PlaneBufferGeometry, Quaternion, TetrahedronBufferGeometry, Vector3 } from "three"
+import { AmbientLight, BufferAttribute, BufferGeometry, DirectionalLight, Euler, Group, InstancedMesh, Matrix4, Mesh, MeshBasicMaterial, MeshPhongMaterial, Object3D, PlaneBufferGeometry, Quaternion, TetrahedronBufferGeometry, TetrahedronGeometry, Vector3 } from "three"
 import Stats from "three/examples/jsm/libs/stats.module.js"
 import { camera, scene } from "../../init"
 import { IData, N, tetrahedronIndices, tetrahedronVertices, timeStep } from "./constants"
