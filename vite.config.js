@@ -11,6 +11,11 @@ export default defineConfig({
   optimizeDeps: {
     entries: "./src/index.ts"
   },
+  resolve: {
+    alias: {
+      misc: "/src/misc"
+    }
+  },
   build: {
     assetsDir: ".",
     rollupOptions: {

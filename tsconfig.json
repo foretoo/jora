@@ -11,7 +11,11 @@
     "esModuleInterop": true,
     "noEmit": true,
     "skipLibCheck": true,
-    "typeRoots": ["src/glsl.d.ts"]
+    "typeRoots": ["src/glsl.d.ts"],
+    "paths": {
+      "misc": ["./src/misc"],
+      "misc/*": ["./src/misc/*"]
+    }
   },
   "include": ["src"],
   "exclude": ["src/lib"]
