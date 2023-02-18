@@ -13,7 +13,8 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      misc: "/src/misc"
+      misc: "/src/misc",
+      init: "/src/init.ts"
     }
   },
   build: {

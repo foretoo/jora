@@ -13,6 +13,7 @@
     "skipLibCheck": true,
     "typeRoots": ["src/glsl.d.ts"],
     "paths": {
+      "init": ["./src/init.ts"],
       "misc": ["./src/misc"],
       "misc/*": ["./src/misc/*"]
     }
