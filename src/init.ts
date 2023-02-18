@@ -64,16 +64,22 @@ const loop = (callback?: (t: number) => void) => {
     orbit.update()
     renderer.render(scene, camera)
   }
+
+  if (!callback) {
+    const emptyLooper = () => {
+      commontask()
+      looping && requestAnimationFrame(emptyLooper)
+    }
+    requestAnimationFrame(emptyLooper)
+    return
+  }
+
   const callbackLooper = (t: number) => {
-    callback!(t)
+    callback(t)
     commontask()
     looping && requestAnimationFrame(callbackLooper)
   }
-  const emptyLooper = () => {
-    commontask()
-    looping && requestAnimationFrame(emptyLooper)
-  }
-  requestAnimationFrame(callback ? callbackLooper : emptyLooper)
+  requestAnimationFrame(callbackLooper)
 }
 
 export {
