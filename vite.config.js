@@ -8,9 +8,6 @@ export default defineConfig({
     open: "/src/index.html",
     host: true,
   },
-  optimizeDeps: {
-    entries: "./src/index.ts"
-  },
   resolve: {
     alias: {
       misc: "/src/misc",
@@ -22,11 +19,15 @@ export default defineConfig({
     rollupOptions: {
       input: "/src/index.ts",
       output: {
-        dir: "dist",
-        assetFileNames: "style.css",
-        entryFileNames: "bundle.js",
+        dir: ".",
+        assetFileNames: "dist/style.css",
+        entryFileNames: "dist/bundle.js",
+        chunkFileNames: "[name]",
+        manualChunks: {
+          "vendors/three.js": ["three"],
+        }
       },
     },
-    emptyOutDir: false,
+    emptyOutDir: true,
   },
 })
