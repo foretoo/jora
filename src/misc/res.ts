@@ -40,7 +40,7 @@ const gpu = new GPUComputationRenderer(WIDTH, HEIGHT, renderer)
 const pointer = new Vector4(0,0,0,0)
 const prevPointer = new Vector4(0,0,0,0)
 
-addEventListener("pointermove", (e) => {
+addEventListener("pointermove", (e: PointerEvent) => {
   prevPointer.copy(pointer)
 
   pointer.x = (e.clientX / innerWidth  *  2 - 1) * originXScale

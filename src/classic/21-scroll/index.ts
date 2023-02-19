@@ -206,7 +206,7 @@ meshes.add(particles)
 const pointer = new Vector2()
 const pointerTarget = new Vector2()
 
-addEventListener("pointermove", (e) => {
+addEventListener("pointermove", (e: PointerEvent) => {
   pointer.x =  e.clientX / innerWidth  * 2 - 1
   pointer.y = -e.clientY / innerHeight * 2 + 1
   pointer.multiplyScalar(0.382)

@@ -25,7 +25,7 @@ export const initiatePointer = (
   const prevPointer = { x, y, z }
   const pointer = { x, y, z, d }
 
-  addEventListener("pointermove", (e) => {
+  addEventListener("pointermove", (e: PointerEvent) => {
     pointer.x = (e.clientX / innerWidth  *  2 - 1) * wScale
     pointer.y = (e.clientY / innerHeight * -2 + 1) * hScale
     const clen = Math.sqrt(pointer.x ** 2 + pointer.y ** 2)

@@ -51,7 +51,7 @@ scene.add(
 
 
 const pointer = new Vector2(0,0)
-addEventListener("pointermove", (e) => {
+addEventListener("pointermove", (e: PointerEvent) => {
   pointer.x = e.clientX /  innerWidth  * 2 - 1
   pointer.y = e.clientY / -innerHeight * 2 + 1
 
