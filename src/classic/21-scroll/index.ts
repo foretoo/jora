@@ -1,7 +1,7 @@
 import "./style.css"
 import { BufferAttribute, Camera, DoubleSide, Group, InstancedMesh, Mesh, MeshBasicMaterial, MeshMatcapMaterial, Object3D, SphereBufferGeometry, TetrahedronBufferGeometry, Texture, TextureLoader, TorusBufferGeometry, TorusKnotBufferGeometry, Vector2 } from "three"
 import { TWEEN } from "three/examples/jsm/libs/tween.module.min.js"
-import { scene, loop, camera, orbit } from "../../init"
+import { scene, loop, camera, orbit } from "init"
 
 
 
