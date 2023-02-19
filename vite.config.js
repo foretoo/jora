@@ -14,20 +14,38 @@ export default defineConfig({
       init: "/src/init.ts"
     }
   },
+
   build: {
-    assetsDir: ".",
     rollupOptions: {
-      input: "/src/index.ts",
+      input: "/src/index.html",
+      external: [
+        "three",
+        "three/examples/jsm/controls/OrbitControls",
+      ],
       output: {
-        dir: ".",
-        assetFileNames: "dist/style.css",
-        entryFileNames: "dist/bundle.js",
+        dir: "dist",
+        assetFileNames: "style.css",
+        entryFileNames: "bundle.js",
         chunkFileNames: "[name]",
-        manualChunks: {
-          "vendors/three.js": ["three"],
+        manualChunks: (id) => {
+          if (!/node_modules/.test(id)) return
+          const chunkPath = id.match(/node_modules\/(.+)/)[1]
+
+          if (!/^three\//.test(chunkPath)) {
+            const name = chunkPath.match(/^[^\/]+/)
+            return `vendors/${name}.js`
+          }
+
+          const threeModuleName = chunkPath.match(/[^\/]+$/)
+          if (threeModuleName === "three.module.js") return
+          return `vendors/three/${threeModuleName}`
+        },
+        paths: {
+          "three": "../vendors/three/three.module.js",
+          "three/examples/jsm/controls/OrbitControls": "../vendors/three/OrbitControls.js",
         }
       },
     },
-    emptyOutDir: true,
+    emptyOutDir: false,
   },
 })
