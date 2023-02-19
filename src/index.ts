@@ -1,5 +1,5 @@
 import "./style.sass"
-import { loop } from "./init"
+// import { loop } from "./init"
 import { play } from "misc/room"
 
-loop(play)
+play()
