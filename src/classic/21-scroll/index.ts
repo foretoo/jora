@@ -262,7 +262,7 @@ function loadTexture(
   material: MeshMatcapMaterial,
 ) {
   const load = () => loader.load(
-    "https://raw.githubusercontent.com/foretoo/jora/main/src/assets/" + name + ".png",
+    "https://raw.githubusercontent.com/foretoo/jora/main/assets/" + name + ".png",
     (texture: Texture) => {
       material.matcap = texture
       material.needsUpdate = true

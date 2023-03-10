@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 144 144"
+  width="144"
+  height="144"
+  fill="transparent"
+  stroke="#fff"
+  stroke-width="16"
+>
+
+  <circle cx="72" cy="72" r="64" />
+  <path d="M64 88 l48-24" />
+  
+</svg>
