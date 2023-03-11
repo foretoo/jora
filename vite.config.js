@@ -1,9 +1,15 @@
 import { defineConfig } from "vite"
 import glsl from "vite-plugin-glsl"
+import wasm from "vite-plugin-wasm"
+import topLevelAwait from "vite-plugin-top-level-await"
 
 export default defineConfig({
   publicDir: false,
-  plugins: [glsl()],
+  plugins: [
+    wasm(),
+    topLevelAwait(),
+    glsl(),
+  ],
   server: {
     open: "/src/index.html",
     host: true,
@@ -11,8 +17,9 @@ export default defineConfig({
   resolve: {
     alias: {
       misc: "/src/misc",
-      init: "/src/init.ts"
-    }
+      init: "/src/init.ts",
+      utils: "/src/utils.ts",
+    },
   },
 
   build: {
@@ -43,7 +50,7 @@ export default defineConfig({
         paths: {
           "three": "../vendors/three/three.module.js",
           "three/examples/jsm/controls/OrbitControls": "../vendors/three/OrbitControls.js",
-        }
+        },
       },
     },
     emptyOutDir: false,

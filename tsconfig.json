@@ -14,6 +14,7 @@
     "typeRoots": ["src/glsl.d.ts"],
     "paths": {
       "init": ["./src/init.ts"],
+      "utils": ["./src/utils.ts"],
       "misc": ["./src/misc"],
       "misc/*": ["./src/misc/*"]
     }
