@@ -16,7 +16,7 @@ let aspect = innerWidth / innerHeight
 const camera = new PerspectiveCamera(60, aspect, 0.1, 100)
 // const camera = new OrthographicCamera(-aspect, aspect, 1, -1, 0.1, 100)
 
-const logs = document.querySelector("#logs")!
+export const logs = document.querySelector("#logs")!
 const orbit = new OrbitControls(camera, canvas)
 
 orbit.addEventListener("change", () => {
