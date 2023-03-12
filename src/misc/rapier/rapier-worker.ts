@@ -1,6 +1,6 @@
 import type { RigidBody, World } from "@dimforge/rapier3d"
 import { Quaternion } from "three"
-import { random, sleep } from "utils"
+import { random } from "utils"
 import { containerBox, IData, N } from "./shared"
 
 declare const self: Worker
