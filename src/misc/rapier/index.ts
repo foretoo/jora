@@ -13,11 +13,7 @@ stats.dom.style.left = "auto"
 stats.dom.style.right = "0"
 document.body.append(stats.dom)
 
-let sendTime: number
-
-let transfer = new Float32Array(N * 10)
-
-const gizmo = new Object3D()
+logs.setAttribute("style", "font-size: 18px")
 
 camera.position.set(3, 6, 9)
 
@@ -25,6 +21,8 @@ camera.position.set(3, 6, 9)
 
 ////////
 //////// SCENE
+
+const gizmo = new Object3D()
 
 const material = new MeshNormalMaterial()
 const wireframe = new MeshBasicMaterial({ wireframe: true })
@@ -45,20 +43,30 @@ scene.position.set(0, -containerBox.height / 2, 0)
 
 const worker = new Worker(new URL("./physic-worker.ts", import.meta.url), { type: "module" })
 
-let n = 0
+const data: IData = {
+  n: 0,
+  transfer: new Float32Array(N * 10),
+}
+
+let sendTime: number
+let requestNumber = 0
+
 const requestWorkerData = () => {
   stats.begin()
   sendTime = performance.now()
-  worker.postMessage({ transfer, n }, [ transfer.buffer ])
+  requestNumber < 1000 && worker.postMessage(data, [ data.transfer.buffer ])
+  // Worker wiil stop after 1000 frame
+  requestNumber++
 }
 
 worker.onmessage = (e: MessageEvent<IData>) => {
-  ({ transfer, n } = e.data)
+  data.n = e.data.n
+  data.transfer = e.data.transfer
 
-  logs.textContent = `${n}`
+  logs.textContent = `${data.n}`
 
-  for (let i = 0; i < n; i++) {
-    copyData(i, transfer, gizmo)
+  for (let i = 0; i < data.n; i++) {
+    copyData(i, data.transfer, gizmo)
     gizmo.updateMatrix()
     meshes.setMatrixAt(i, gizmo.matrix)
   }
@@ -66,9 +74,10 @@ worker.onmessage = (e: MessageEvent<IData>) => {
 
   const delay = timeStep * 1000 - (performance.now() - sendTime)
   setTimeout(requestWorkerData, Math.max(delay, 0))
-  
+
   stats.end()
 }
+
 requestWorkerData()
 
 

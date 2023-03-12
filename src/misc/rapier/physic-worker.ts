@@ -1,6 +1,6 @@
 import type { RigidBody, World } from "@dimforge/rapier3d"
 import { Quaternion } from "three"
-import { random } from "utils"
+import { random, sleep } from "utils"
 import { containerBox, IData, N } from "./shared"
 
 declare const self: Worker
@@ -35,10 +35,11 @@ for (let i = 0; i < N * 3; i += 3) {
 
 
 
-////////
-//////// PHYSIC WORLD
-
 import("@dimforge/rapier3d").then((RAPIER) => {
+
+  ////////
+  //////// PHYSIC WORLD
+
   world = new RAPIER.World({ x: 0.0, y: -9.81, z: 0.0 })
 
   createContainer(world, RAPIER)
@@ -72,18 +73,14 @@ import("@dimforge/rapier3d").then((RAPIER) => {
     bodies.push(cube)
   }
 
-  ready = true
-})
 
 
+  ////////
+  //////// WORKER
 
-////////
-//////// WORKER
-
-self.onmessage = (e: MessageEvent<IData>) => {
-  if (ready) {
-    e.data.n < N && bodies[e.data.n].setEnabled(true)
+  self.onmessage = (e: MessageEvent<IData>) => {
     e.data.n = Math.min(N, ++e.data.n)
+    bodies[e.data.n - 1].setEnabled(true)
 
     world.step()
 
@@ -95,8 +92,13 @@ self.onmessage = (e: MessageEvent<IData>) => {
 
       if (velSum < 0.001) bodies[i].sleep()
     }
-  }
 
+    self.postMessage(e.data, [ e.data.transfer.buffer ])
+  }
+})
+
+self.onmessage = async (e: MessageEvent<IData>) => {
+  await sleep(100)
   self.postMessage(e.data, [ e.data.transfer.buffer ])
 }
 
