@@ -12,18 +12,8 @@ type Rapier = typeof import("@dimforge/rapier3d")
 ////////
 //////// SETUP
 
-let world: World
-const bodies: RigidBody[] = []
-let ready = false
-
-const colideMaterial = {
-  friction: 1,
-  restitution: 0.2,
-}
-
-const bodyBox = {
-  min: 0.1, max: 0.5
-}
+const colideMaterial = { friction: 1, restitution: 0.2 }
+const bodyBox = { min: 0.1, max: 0.5 }
 
 const sizes = new Float32Array(N * 3)
 
@@ -40,19 +30,19 @@ import("@dimforge/rapier3d").then((RAPIER) => {
   ////////
   //////// PHYSIC WORLD
 
-  world = new RAPIER.World({ x: 0.0, y: -9.81, z: 0.0 })
+  const world = new RAPIER.World({ x: 0.0, y: -9.81, z: 0.0 })
 
   createContainer(world, RAPIER)
 
-  const ballBodyDesc = RAPIER.RigidBodyDesc.dynamic()
-    .setCanSleep(true)
+  const ballBodyDesc = RAPIER.RigidBodyDesc.dynamic().setCanSleep(true)
 
+  const bodies: RigidBody[] = []
   for (let i = 0; i < N; i++) {
     const cube = world.createRigidBody(ballBodyDesc)
 
     world.createCollider(
       RAPIER.ColliderDesc
-        .cuboid(sizes[i * 3] / 2, sizes[i * 3 + 1] / 2, sizes[i * 3 + 2] / 2)
+        .cuboid(sizes[i * 3] * 0.5, sizes[i * 3 + 1] * 0.5, sizes[i * 3 + 2] * 0.5)
         .setFriction(colideMaterial.friction)
         .setRestitution(colideMaterial.restitution),
       cube
