@@ -41,7 +41,7 @@ scene.position.set(0, -containerBox.height / 2, 0)
 ////////
 //////// WORKER
 
-const worker = new Worker(new URL("./physic-worker.ts", import.meta.url), { type: "module" })
+const worker = new Worker(new URL("./rapier-worker.ts", import.meta.url), { type: "module" })
 
 let data: IData
 let sendTime: number
