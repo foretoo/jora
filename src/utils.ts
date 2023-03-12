@@ -50,3 +50,7 @@ export function getRandomBallPoint(
   const z = r * cosPhi
   return { x, y, z }
 }
+
+export const sleep = async (time: number): Promise<never> => {
+  return await new Promise((res) => void setTimeout(res, time))
+}
