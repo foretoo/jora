@@ -16,17 +16,19 @@ let aspect = innerWidth / innerHeight
 const camera = new PerspectiveCamera(60, aspect, 0.1, 100)
 // const camera = new OrthographicCamera(-aspect, aspect, 1, -1, 0.1, 100)
 
-export const logs = document.querySelector("#logs")!
-const orbit = new OrbitControls(camera, canvas)
+export const logs = document.querySelector("#logs")! as Element & { addCameraListener(): void }
+logs.addCameraListener = () => {
+  orbit.addEventListener("change", () => {
+    const { x: px, y: py, z: pz } = camera.position
+    const { x: rx, y: ry, z: rz } = camera.rotation
+    logs && (logs.innerHTML =
+      `pos: (${px.toFixed(4)}, ${py.toFixed(4)}, ${pz.toFixed(4)})\n` +
+      `rot: (${rx.toFixed(4)}, ${ry.toFixed(4)}, ${rz.toFixed(4)})\n`
+    )
+  })
+}
 
-orbit.addEventListener("change", () => {
-  const { x: px, y: py, z: pz } = camera.position
-  const { x: rx, y: ry, z: rz } = camera.rotation
-  logs && (logs.innerHTML =
-    `pos: (${px.toFixed(4)}, ${py.toFixed(4)}, ${pz.toFixed(4)})\n` +
-    `rot: (${rx.toFixed(4)}, ${ry.toFixed(4)}, ${rz.toFixed(4)})\n`
-  )
-})
+const orbit = new OrbitControls(camera, canvas)
 
 
 // Renderer
