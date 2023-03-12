@@ -78,29 +78,27 @@ import("@dimforge/rapier3d").then((RAPIER) => {
   ////////
   //////// WORKER
 
+  let data = {
+    n: 0,
+    transfer: new Float32Array(N * 10)
+  }
+
   self.onmessage = (e: MessageEvent<IData>) => {
-    e.data.n = Math.min(N, ++e.data.n)
-    bodies[e.data.n - 1].setEnabled(true)
+    data = e.data
+
+    data.n = Math.min(N, ++data.n)
+    bodies[data.n - 1].setEnabled(true)
 
     world.step()
 
-    for (let i = 0; i < e.data.n; i++) {
-      pasteData(i, e.data.transfer, bodies[i])
-
-      const v = bodies[i].linvel()
-      const velSum = Math.abs(v.x) + Math.abs(v.y) + Math.abs(v.z)
-
-      if (velSum < 0.001) bodies[i].sleep()
+    for (let i = 0; i < data.n; i++) {
+      pasteData(i, data.transfer, bodies[i])
     }
 
-    self.postMessage(e.data, [ e.data.transfer.buffer ])
+    self.postMessage(data, [ data.transfer.buffer ])
   }
+  self.postMessage(data, [ data.transfer.buffer ])
 })
-
-self.onmessage = async (e: MessageEvent<IData>) => {
-  await sleep(100)
-  self.postMessage(e.data, [ e.data.transfer.buffer ])
-}
 
 
 

@@ -43,11 +43,7 @@ scene.position.set(0, -containerBox.height / 2, 0)
 
 const worker = new Worker(new URL("./physic-worker.ts", import.meta.url), { type: "module" })
 
-const data: IData = {
-  n: 0,
-  transfer: new Float32Array(N * 10),
-}
-
+let data: IData
 let sendTime: number
 let requestNumber = 0
 
@@ -60,8 +56,7 @@ const requestWorkerData = () => {
 }
 
 worker.onmessage = (e: MessageEvent<IData>) => {
-  data.n = e.data.n
-  data.transfer = e.data.transfer
+  data = e.data
 
   logs.textContent = `${data.n}`
 
@@ -77,8 +72,6 @@ worker.onmessage = (e: MessageEvent<IData>) => {
 
   stats.end()
 }
-
-requestWorkerData()
 
 
 
