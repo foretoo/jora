@@ -128,40 +128,40 @@ function createContainer(world: World, RAPIER: Rapier) {
     .setFriction(colideMaterial.friction)
     .setRestitution(colideMaterial.restitution)
   )
-  // X+ plane
-  world.createCollider(
-    new RAPIER.ColliderDesc(
-      new RAPIER.HalfSpace({ x: 1, y: 0, z: 0 })
-    )
-    .setFriction(colideMaterial.friction)
-    .setRestitution(colideMaterial.restitution)
-    .setTranslation(containerBox.width * -0.5, 0, 0)
-  )
-  // X- plane
-  world.createCollider(
-    new RAPIER.ColliderDesc(
-      new RAPIER.HalfSpace({ x: -1, y: 0, z: 0 })
-    )
-    .setFriction(colideMaterial.friction)
-    .setRestitution(colideMaterial.restitution)
-    .setTranslation(containerBox.width * 0.5, 0, 0)
-  )
-  // Z+ plane
-  world.createCollider(
-    new RAPIER.ColliderDesc(
-      new RAPIER.HalfSpace({ x: 0, y: 0, z: 1 })
-    )
-    .setFriction(colideMaterial.friction)
-    .setRestitution(colideMaterial.restitution)
-    .setTranslation(0, 0, containerBox.depth * -0.5)
-  )
-  // Z- plane
-  world.createCollider(
-    new RAPIER.ColliderDesc(
-      new RAPIER.HalfSpace({ x: 0, y: 0, z: -1 })
-    )
-    .setFriction(colideMaterial.friction)
-    .setRestitution(colideMaterial.restitution)
-    .setTranslation(0, 0, containerBox.depth * 0.5)
-  )
+  // // X+ plane
+  // world.createCollider(
+  //   new RAPIER.ColliderDesc(
+  //     new RAPIER.HalfSpace({ x: 1, y: 0, z: 0 })
+  //   )
+  //   .setFriction(colideMaterial.friction)
+  //   .setRestitution(colideMaterial.restitution)
+  //   .setTranslation(containerBox.width * -0.5, 0, 0)
+  // )
+  // // X- plane
+  // world.createCollider(
+  //   new RAPIER.ColliderDesc(
+  //     new RAPIER.HalfSpace({ x: -1, y: 0, z: 0 })
+  //   )
+  //   .setFriction(colideMaterial.friction)
+  //   .setRestitution(colideMaterial.restitution)
+  //   .setTranslation(containerBox.width * 0.5, 0, 0)
+  // )
+  // // Z+ plane
+  // world.createCollider(
+  //   new RAPIER.ColliderDesc(
+  //     new RAPIER.HalfSpace({ x: 0, y: 0, z: 1 })
+  //   )
+  //   .setFriction(colideMaterial.friction)
+  //   .setRestitution(colideMaterial.restitution)
+  //   .setTranslation(0, 0, containerBox.depth * -0.5)
+  // )
+  // // Z- plane
+  // world.createCollider(
+  //   new RAPIER.ColliderDesc(
+  //     new RAPIER.HalfSpace({ x: 0, y: 0, z: -1 })
+  //   )
+  //   .setFriction(colideMaterial.friction)
+  //   .setRestitution(colideMaterial.restitution)
+  //   .setTranslation(0, 0, containerBox.depth * 0.5)
+  // )
 }
