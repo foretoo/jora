@@ -1,11 +1,9 @@
-import type { RigidBody, World } from "@dimforge/rapier3d"
+import type { RigidBody } from "@dimforge/rapier3d"
 import { Quaternion } from "three"
 import { random } from "utils"
 import { containerBox, IData, N } from "./shared"
 
 declare const self: Worker
-
-type Rapier = typeof import("@dimforge/rapier3d")
 
 
 
@@ -25,43 +23,22 @@ for (let i = 0; i < N * 3; i += 3) {
 
 
 
-const RAPIER = await import("@dimforge/rapier3d")
-
 ////////
 //////// PHYSIC WORLD
 
+const RAPIER = await import("@dimforge/rapier3d")
+
 const world = new RAPIER.World({ x: 0.0, y: -9.81, z: 0.0 })
 
-createContainer(world, RAPIER)
+createPlane( 0,  1,  0,  0, 0, 0 ) // Y+ plane
+createPlane( 1,  0,  0,  containerBox.width * -0.5, 0, 0 ) // X+ plane
+createPlane(-1,  0,  0,  containerBox.width *  0.5, 0, 0 ) // X- plane
+createPlane( 0,  0,  1,  0, 0, containerBox.depth * -0.5 ) // Z+ plane
+createPlane( 0,  0, -1,  0, 0, containerBox.depth *  0.5 ) // Z- plane
 
 const ballBodyDesc = RAPIER.RigidBodyDesc.dynamic().setCanSleep(true)
 
 const bodies: RigidBody[] = []
-for (let i = 0; i < N; i++) {
-  const cube = world.createRigidBody(ballBodyDesc)
-
-  world.createCollider(
-    RAPIER.ColliderDesc
-      .cuboid(sizes[i * 3] * 0.5, sizes[i * 3 + 1] * 0.5, sizes[i * 3 + 2] * 0.5)
-      .setFriction(colideMaterial.friction)
-      .setRestitution(colideMaterial.restitution),
-    cube
-  )
-
-  cube.setTranslation({
-    x: (containerBox.width - bodyBox.max) * random(-0.5, 0.5) * 0.5,
-    y: containerBox.height,
-    z: (containerBox.depth - bodyBox.max) * random(-0.5, 0.5) * 0.5,
-  }, false)
-
-  const rot = new Quaternion().random()
-  cube.setRotation({
-    x: rot.x, y: rot.y, z: rot.z, w: rot.w
-  }, false)
-
-  cube.setEnabled(false)
-  bodies.push(cube)
-}
 
 
 
@@ -69,15 +46,15 @@ for (let i = 0; i < N; i++) {
 //////// WORKER
 
 let data = {
-  n: 0,
-  transfer: new Float32Array(N * 10)
+  n: 0, // number of currently created boxes
+  transfer: new Float32Array(N * 10), // transfer data to main thread
 }
 
 self.onmessage = (e: MessageEvent<IData>) => {
   data = e.data
 
+  data.n < N && createBox(data.n)
   data.n = Math.min(N, ++data.n)
-  bodies[data.n - 1].setEnabled(true)
 
   world.step()
 
@@ -118,49 +95,47 @@ function pasteData(
 
 
 
-function createContainer(world: World, RAPIER: Rapier) {
-  // Y+ plane
+function createPlane(
+  nx: number,
+  ny: number,
+  nz: number,
+  px: number,
+  py: number,
+  pz: number,
+) {
   world.createCollider(
     new RAPIER.ColliderDesc(
-      new RAPIER.HalfSpace({ x: 0, y: 1, z: 0 })
+      new RAPIER.HalfSpace({ x: nx, y: ny, z: nz }),
     )
-    .setFriction(colideMaterial.friction)
-    .setRestitution(colideMaterial.restitution)
+      .setFriction(colideMaterial.friction)
+      .setRestitution(colideMaterial.restitution)
+      .setTranslation(px, py, pz),
   )
-  // // X+ plane
-  // world.createCollider(
-  //   new RAPIER.ColliderDesc(
-  //     new RAPIER.HalfSpace({ x: 1, y: 0, z: 0 })
-  //   )
-  //   .setFriction(colideMaterial.friction)
-  //   .setRestitution(colideMaterial.restitution)
-  //   .setTranslation(containerBox.width * -0.5, 0, 0)
-  // )
-  // // X- plane
-  // world.createCollider(
-  //   new RAPIER.ColliderDesc(
-  //     new RAPIER.HalfSpace({ x: -1, y: 0, z: 0 })
-  //   )
-  //   .setFriction(colideMaterial.friction)
-  //   .setRestitution(colideMaterial.restitution)
-  //   .setTranslation(containerBox.width * 0.5, 0, 0)
-  // )
-  // // Z+ plane
-  // world.createCollider(
-  //   new RAPIER.ColliderDesc(
-  //     new RAPIER.HalfSpace({ x: 0, y: 0, z: 1 })
-  //   )
-  //   .setFriction(colideMaterial.friction)
-  //   .setRestitution(colideMaterial.restitution)
-  //   .setTranslation(0, 0, containerBox.depth * -0.5)
-  // )
-  // // Z- plane
-  // world.createCollider(
-  //   new RAPIER.ColliderDesc(
-  //     new RAPIER.HalfSpace({ x: 0, y: 0, z: -1 })
-  //   )
-  //   .setFriction(colideMaterial.friction)
-  //   .setRestitution(colideMaterial.restitution)
-  //   .setTranslation(0, 0, containerBox.depth * 0.5)
-  // )
+}
+
+
+
+function createBox(i: number) {
+  const cube = world.createRigidBody(ballBodyDesc)
+
+  cube.setTranslation({
+    x: (containerBox.width - bodyBox.max) * random(-0.5, 0.5) * 0.5,
+    y: containerBox.height,
+    z: (containerBox.depth - bodyBox.max) * random(-0.5, 0.5) * 0.5,
+  }, false)
+
+  const rot = new Quaternion().random()
+  cube.setRotation({ x: rot.x, y: rot.y, z: rot.z, w: rot.w }, false)
+
+  cube.setAdditionalMass(sizes[i * 3] * sizes[i * 3 + 1] * sizes[i * 3 + 2] * 100, false)
+
+  world.createCollider(
+    RAPIER.ColliderDesc
+      .cuboid(sizes[i * 3] * 0.5, sizes[i * 3 + 1] * 0.5, sizes[i * 3 + 2] * 0.5)
+      .setFriction(colideMaterial.friction)
+      .setRestitution(colideMaterial.restitution),
+    cube,
+  )
+
+  bodies.push(cube)
 }
