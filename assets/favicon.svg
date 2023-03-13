@@ -3,9 +3,17 @@
   width="144"
   height="144"
   fill="transparent"
-  stroke="#fff"
+  stroke="#111"
   stroke-width="16"
 >
+
+  <style>
+    @media (prefers-color-scheme: dark) {
+      * {
+        stroke: #eee
+      }
+    }
+  </style>
 
   <circle cx="72" cy="72" r="64" />
   <path d="M64 88 l48-24" />
