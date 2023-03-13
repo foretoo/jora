@@ -1,3 +1,6 @@
+// derived from "ammojs-typed" https://github.com/giniedp/ammojs-typed
+// reconfigured a little
+
 declare module "vendors/ammo.wasm.js" {
     function Ammo<T>(target?: T): Promise<T & typeof Ammo>;
     declare namespace Ammo {

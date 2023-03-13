@@ -55,9 +55,7 @@ export const sleep = async (time: number): Promise<never> => await new Promise((
 
 export const randomQuaternion = () => {
 
-  // Derived from http://planning.cs.uiuc.edu/node198.html
-  // Note, this source uses w, x, y, z ordering,
-  // so we swap the order below.
+  // from THREE.Quaternion.random
 
   const u1 = Math.random()
   const sqrt1u1 = Math.sqrt( 1 - u1 )

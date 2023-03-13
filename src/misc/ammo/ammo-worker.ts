@@ -1,5 +1,4 @@
 import { Ammo } from "vendors/ammo.wasm.js"
-import { Quaternion } from "three"
 import { random } from "utils"
 import { containerBox, IData, N, timeStep } from "./shared"
 
@@ -11,8 +10,6 @@ declare const self: Worker
 
 ////////
 //////// SETUP
-
-const bodies: Ammo.btRigidBody[] = []
 
 const colideMaterial = { friction: 1, restitution: 0.2 }
 const bodyBox = { min: 0.1, max: 0.5 }
@@ -44,7 +41,13 @@ world.setGravity(new AMMO.btVector3(0, -9.81, 0))
 
 const transform = new AMMO.btTransform()
 
-createContainer()
+createWall( 0, -50, 0)  // Y+ wall
+createWall(-50 - containerBox.width * 0.5, 0,  0)  // X+ wall
+createWall( 50 + containerBox.width * 0.5, 0,  0)  // X- wall
+createWall( 0,  0, -50 - containerBox.depth * 0.5) // Z+ wall
+createWall( 0,  0,  50 + containerBox.depth * 0.5) // Z- wall
+
+const bodies: Ammo.btRigidBody[] = []
 
 
 
@@ -77,10 +80,14 @@ self.postMessage(data, [ data.transfer.buffer ])
 ////////
 //////// UTILS
 
-function createContainer() {
+function createWall(
+  x: number,
+  y: number,
+  z: number,
+) {
   const shape = new AMMO.btBoxShape(new AMMO.btVector3(50, 50, 50))
   transform.setIdentity()
-  transform.setOrigin(new AMMO.btVector3(0, -50, 0))
+  transform.setOrigin(new AMMO.btVector3(x, y, z))
   const inertia = new AMMO.btVector3(0, 0, 0)
   const motionstate = new AMMO.btDefaultMotionState(transform)
   const info = new AMMO.btRigidBodyConstructionInfo(0, motionstate, shape, inertia)
@@ -106,9 +113,9 @@ function createBox(i: number) {
     (containerBox.depth - bodyBox.max) * random(-0.5, 0.5) * 0.5,
   ))
 
-  transform.setRotation(new AMMO.btQuaternion(
-    ...Object.values(new Quaternion().random()) as Tuple<number, 4>)
-  )
+  const quat = new AMMO.btQuaternion(0, 0, 0, 1)
+  quat.setEulerZYX(random(Math.PI * 2), random(Math.PI * 2), random(Math.PI * 2))
+  transform.setRotation(quat)
 
   const mass = sizes[i * 3] * sizes[i * 3 + 1] * sizes[i * 3 + 2] * 100
   const inertia = new AMMO.btVector3(0, 0, 0)

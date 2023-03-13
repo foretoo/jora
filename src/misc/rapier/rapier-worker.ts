@@ -96,12 +96,8 @@ function pasteData(
 
 
 function createPlane(
-  nx: number,
-  ny: number,
-  nz: number,
-  px: number,
-  py: number,
-  pz: number,
+  nx: number, ny: number, nz: number,
+  px: number, py: number, pz: number,
 ) {
   world.createCollider(
     new RAPIER.ColliderDesc(
