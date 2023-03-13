@@ -25,70 +25,69 @@ for (let i = 0; i < N * 3; i += 3) {
 
 
 
-import("@dimforge/rapier3d").then((RAPIER) => {
+const RAPIER = await import("@dimforge/rapier3d")
 
-  ////////
-  //////// PHYSIC WORLD
+////////
+//////// PHYSIC WORLD
 
-  const world = new RAPIER.World({ x: 0.0, y: -9.81, z: 0.0 })
+const world = new RAPIER.World({ x: 0.0, y: -9.81, z: 0.0 })
 
-  createContainer(world, RAPIER)
+createContainer(world, RAPIER)
 
-  const ballBodyDesc = RAPIER.RigidBodyDesc.dynamic().setCanSleep(true)
+const ballBodyDesc = RAPIER.RigidBodyDesc.dynamic().setCanSleep(true)
 
-  const bodies: RigidBody[] = []
-  for (let i = 0; i < N; i++) {
-    const cube = world.createRigidBody(ballBodyDesc)
+const bodies: RigidBody[] = []
+for (let i = 0; i < N; i++) {
+  const cube = world.createRigidBody(ballBodyDesc)
 
-    world.createCollider(
-      RAPIER.ColliderDesc
-        .cuboid(sizes[i * 3] * 0.5, sizes[i * 3 + 1] * 0.5, sizes[i * 3 + 2] * 0.5)
-        .setFriction(colideMaterial.friction)
-        .setRestitution(colideMaterial.restitution),
-      cube
-    )
+  world.createCollider(
+    RAPIER.ColliderDesc
+      .cuboid(sizes[i * 3] * 0.5, sizes[i * 3 + 1] * 0.5, sizes[i * 3 + 2] * 0.5)
+      .setFriction(colideMaterial.friction)
+      .setRestitution(colideMaterial.restitution),
+    cube
+  )
 
-    cube.setTranslation({
-      x: (containerBox.width - bodyBox.max) * random(-0.5, 0.5),
-      y: containerBox.height,
-      z: (containerBox.depth - bodyBox.max) * random(-0.5, 0.5),
-    }, false)
+  cube.setTranslation({
+    x: (containerBox.width - bodyBox.max) * random(-0.5, 0.5),
+    y: containerBox.height,
+    z: (containerBox.depth - bodyBox.max) * random(-0.5, 0.5),
+  }, false)
 
-    const rot = new Quaternion().random()
-    cube.setRotation({
-      x: rot.x, y: rot.y, z: rot.z, w: rot.w
-    }, false)
+  const rot = new Quaternion().random()
+  cube.setRotation({
+    x: rot.x, y: rot.y, z: rot.z, w: rot.w
+  }, false)
 
-    cube.setEnabled(false)
-    bodies.push(cube)
+  cube.setEnabled(false)
+  bodies.push(cube)
+}
+
+
+
+////////
+//////// WORKER
+
+let data = {
+  n: 0,
+  transfer: new Float32Array(N * 10)
+}
+
+self.onmessage = (e: MessageEvent<IData>) => {
+  data = e.data
+
+  data.n = Math.min(N, ++data.n)
+  bodies[data.n - 1].setEnabled(true)
+
+  world.step()
+
+  for (let i = 0; i < data.n; i++) {
+    pasteData(i, data.transfer, bodies[i])
   }
 
-
-
-  ////////
-  //////// WORKER
-
-  let data = {
-    n: 0,
-    transfer: new Float32Array(N * 10)
-  }
-
-  self.onmessage = (e: MessageEvent<IData>) => {
-    data = e.data
-
-    data.n = Math.min(N, ++data.n)
-    bodies[data.n - 1].setEnabled(true)
-
-    world.step()
-
-    for (let i = 0; i < data.n; i++) {
-      pasteData(i, data.transfer, bodies[i])
-    }
-
-    self.postMessage(data, [ data.transfer.buffer ])
-  }
   self.postMessage(data, [ data.transfer.buffer ])
-})
+}
+self.postMessage(data, [ data.transfer.buffer ])
 
 
 
