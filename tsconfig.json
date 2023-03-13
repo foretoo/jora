@@ -11,14 +11,14 @@
     "esModuleInterop": true,
     "noEmit": true,
     "skipLibCheck": true,
-    "typeRoots": ["src/custom.d.ts"],
     "paths": {
       "init": ["./src/init.ts"],
       "utils": ["./src/utils.ts"],
       "misc": ["./src/misc"],
-      "misc/*": ["./src/misc/*"]
+      "misc/*": ["./src/misc/*"],
+      "vendors/*": ["./dist/vendors/*"]
     }
   },
-  "include": ["src"],
+  "include": ["src", "types"],
   "exclude": ["src/lib"]
 }

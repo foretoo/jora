@@ -19,6 +19,7 @@ export default defineConfig({
       misc: "/src/misc",
       init: "/src/init.ts",
       utils: "/src/utils.ts",
+      vendors: "/dist/vendors"
     },
   },
 
