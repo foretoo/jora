@@ -1,7 +1,8 @@
 import { BoxGeometry, InstancedMesh, Mesh, MeshBasicMaterial, MeshNormalMaterial, Object3D } from "three"
-import { containerBox, IData, N, timeStep } from "./shared"
-import { camera, logs, scene } from "init"
 import Stats from "three/examples/jsm/libs/stats.module"
+import { camera, logs, scene } from "init"
+import { containerBox, IData, N, timeStep } from "./shared"
+import PhysicsWorker from "./rapier-worker?worker"
 
 
 
@@ -45,18 +46,16 @@ scene.position.set(0, -containerBox.height / 2, 0)
 ////////
 //////// WORKER
 
-const worker = new Worker(new URL("./rapier-worker.ts", import.meta.url), { type: "module" })
+// const worker = new Worker(new URL("./rapier-worker.ts", import.meta.url), { type: "module" })
+const worker = new PhysicsWorker()
 
 let data: IData
 let sendTime: number
-let requestNumber = 0
 
 const requestWorkerData = () => {
   stats.begin()
   sendTime = performance.now()
-  requestNumber < 1000 && worker.postMessage(data, [ data.transfer.buffer ])
-  // Worker wiil stop after 1000 frame
-  requestNumber++
+  worker.postMessage(data, [ data.transfer.buffer ])
 }
 
 worker.onmessage = (e: MessageEvent<IData>) => {
