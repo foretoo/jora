@@ -32,6 +32,10 @@ container.translateY(containerBox.height / 2)
 scene.add(container)
 
 const meshes = new InstancedMesh(new BoxGeometry(), material, N)
+gizmo.scale.set(0,0,0)
+gizmo.updateMatrix()
+for (let i = 0; i < N; i++) meshes.setMatrixAt(i, gizmo.matrix)
+meshes.instanceMatrix.needsUpdate = true
 scene.add(meshes)
 
 scene.position.set(0, -containerBox.height / 2, 0)
