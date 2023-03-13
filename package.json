@@ -27,6 +27,7 @@
   },
   "dependencies": {
     "@dimforge/rapier3d": "^0.11.2",
+    "ammojs-typed": "^1.0.6",
     "cannon-es": "^0.20.0",
     "dat.gui": "^0.7.9",
     "gsap": "^3.10.4",
