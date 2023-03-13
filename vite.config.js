@@ -56,4 +56,11 @@ export default defineConfig({
     },
     emptyOutDir: false,
   },
+
+  worker: {
+    plugins: [
+      wasm(),
+      topLevelAwait(),
+    ],
+  }
 })
