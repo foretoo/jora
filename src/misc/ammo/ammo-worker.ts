@@ -14,7 +14,7 @@ declare const self: Worker
 
 const bodies: Ammo.btRigidBody[] = []
 
-const colideMaterial = { friction: 1, restitution: 0.667 }
+const colideMaterial = { friction: 1, restitution: 0.2 }
 const bodyBox = { min: 0.1, max: 0.5 }
 
 const sizes = new Float32Array(N * 3)
@@ -77,6 +77,54 @@ self.postMessage(data, [ data.transfer.buffer ])
 ////////
 //////// UTILS
 
+function createContainer() {
+  const shape = new AMMO.btBoxShape(new AMMO.btVector3(50, 50, 50))
+  transform.setIdentity()
+  transform.setOrigin(new AMMO.btVector3(0, -50, 0))
+  const inertia = new AMMO.btVector3(0, 0, 0)
+  const motionstate = new AMMO.btDefaultMotionState(transform)
+  const info = new AMMO.btRigidBodyConstructionInfo(0, motionstate, shape, inertia)
+  info.set_m_friction(colideMaterial.friction)
+  info.set_m_restitution(colideMaterial.restitution)
+  const body = new AMMO.btRigidBody(info)
+
+  world.addRigidBody(body)
+}
+
+
+
+function createBox(i: number) {
+  const shape = new AMMO.btBoxShape(
+    new AMMO.btVector3(sizes[i * 3] * 0.5, sizes[i * 3 + 1] * 0.5, sizes[i * 3 + 2] * 0.5),
+  )
+  shape.setMargin(0.05)
+
+  transform.setIdentity()
+  transform.setOrigin(new AMMO.btVector3(
+    (containerBox.width - bodyBox.max) * random(-0.5, 0.5) * 0.5,
+    containerBox.height,
+    (containerBox.depth - bodyBox.max) * random(-0.5, 0.5) * 0.5,
+  ))
+
+  transform.setRotation(new AMMO.btQuaternion(
+    ...Object.values(new Quaternion().random()) as Tuple<number, 4>)
+  )
+
+  const mass = sizes[i * 3] * sizes[i * 3 + 1] * sizes[i * 3 + 2] * 100
+  const inertia = new AMMO.btVector3(0, 0, 0)
+  shape.calculateLocalInertia(mass, inertia)
+  const motionState = new AMMO.btDefaultMotionState(transform)
+  const info = new AMMO.btRigidBodyConstructionInfo(mass, motionState, shape, inertia)
+  info.set_m_friction(colideMaterial.friction)
+  info.set_m_restitution(colideMaterial.restitution)
+  const body = new AMMO.btRigidBody(info)
+
+  world.addRigidBody(body)
+  bodies.push(body)
+}
+
+
+
 function pasteData(
   i: number,
   data: Float32Array,
@@ -98,47 +146,4 @@ function pasteData(
   data[j + 7] = sizes[k + 0]
   data[j + 8] = sizes[k + 1]
   data[j + 9] = sizes[k + 2]
-}
-
-function createContainer() {
-  const shape = new AMMO.btBoxShape(new AMMO.btVector3(50, 50, 50))
-  transform.setIdentity()
-  transform.setOrigin(new AMMO.btVector3(0, -50, 0))
-  const inertia = new AMMO.btVector3(0, 0, 0)
-  const motionstate = new AMMO.btDefaultMotionState(transform)
-  const info = new AMMO.btRigidBodyConstructionInfo(0, motionstate, shape, inertia) as Ammo.btRigidBodyConstructionInfo
-  info.set_m_friction(colideMaterial.friction)
-  info.set_m_restitution(colideMaterial.restitution)
-  const body = new AMMO.btRigidBody(info) as Ammo.btRigidBody
-
-  world.addRigidBody(body)
-}
-
-function createBox(i: number) {
-  const shape = new AMMO.btBoxShape(
-    new AMMO.btVector3(sizes[i * 3] * 0.5, sizes[i * 3 + 1] * 0.5, sizes[i * 3 + 2] * 0.5),
-  ) as Ammo.btBoxShape
-
-  transform.setIdentity()
-  transform.setOrigin(new AMMO.btVector3(
-    (containerBox.width - bodyBox.max) * random(-0.5, 0.5),
-    containerBox.height,
-    (containerBox.depth - bodyBox.max) * random(-0.5, 0.5),
-  ))
-
-  transform.setRotation(new AMMO.btQuaternion(...Object.values(new Quaternion().random()) as Tuple<number, 4>))
-
-  const mass = 1
-  const inertia = new AMMO.btVector3(0, 0, 0)
-  shape.calculateLocalInertia(mass, inertia)
-  const motionState = new AMMO.btDefaultMotionState(transform)
-  const info = new AMMO.btRigidBodyConstructionInfo(mass, motionState, shape, inertia) as Ammo.btRigidBodyConstructionInfo
-  info.set_m_friction(colideMaterial.friction)
-  info.set_m_restitution(colideMaterial.restitution)
-  // info.set_m_linearSleepingThreshold(1)
-  // info.set_m_angularSleepingThreshold(1)
-  const body = new AMMO.btRigidBody(info)
-
-  world.addRigidBody(body)
-  bodies.push(body)
 }
