@@ -49,9 +49,9 @@ for (let i = 0; i < N; i++) {
   )
 
   cube.setTranslation({
-    x: (containerBox.width - bodyBox.max) * random(-0.5, 0.5),
+    x: (containerBox.width - bodyBox.max) * random(-0.5, 0.5) * 0.5,
     y: containerBox.height,
-    z: (containerBox.depth - bodyBox.max) * random(-0.5, 0.5),
+    z: (containerBox.depth - bodyBox.max) * random(-0.5, 0.5) * 0.5,
   }, false)
 
   const rot = new Quaternion().random()
