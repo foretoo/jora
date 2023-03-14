@@ -5,7 +5,7 @@ export type IData = {
 
 
 
-export const N = 777
+export const N = 1000
 
 
 

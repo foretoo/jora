@@ -50,11 +50,15 @@ let data = {
   transfer: new Float32Array(N * 10), // transfer data to main thread
 }
 
+let count = 0
+const f = 234
 self.onmessage = (e: MessageEvent<IData>) => {
   data = e.data
 
-  data.n < N && createBox(data.n)
-  data.n = Math.min(N, ++data.n)
+  count < N && createBox(count)
+  // this hack for tower variant (all walls included)
+  count >= f && count < N + f && bodies[count - f].setBodyType(RAPIER.RigidBodyType.Fixed, false)
+  data.n = Math.min(N, ++count)
 
   world.step()
 
@@ -62,7 +66,7 @@ self.onmessage = (e: MessageEvent<IData>) => {
     pasteData(i, data.transfer, bodies[i])
   }
 
-  self.postMessage(data, [ data.transfer.buffer ])
+  count <= N + f && self.postMessage(data, [ data.transfer.buffer ])
 }
 self.postMessage(data, [ data.transfer.buffer ])
 
