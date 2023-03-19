@@ -28,7 +28,8 @@
         "linebreak-style": [ 1, "unix" ],
         "no-unused-vars": [ 1, { "vars": "local" }],
         "object-curly-newline": [ 1, {
-            "multiline": true
+            "multiline": true,
+            "consistent": true	
         }],
         "object-property-newline": [ 1, {
             "allowAllPropertiesOnSameLine": true
