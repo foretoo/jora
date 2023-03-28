@@ -43,7 +43,7 @@ addEventListener("resize", () => {
   // camera.right =  aspect
   camera.updateProjectionMatrix()
 
-  renderer.setSize(innerWidth, innerHeight)  
+  renderer.setSize(innerWidth, innerHeight)
 })
 
 
@@ -59,8 +59,8 @@ window.onkeydown = (e: KeyboardEvent) => {
     }
   }
 }
-let _callback: ((t: number) => void) | undefined
-const loop = (callback?: (t: number) => void) => {
+let _callback: FrameRequestCallback | undefined
+const loop = (callback?: FrameRequestCallback) => {
   _callback = callback
   const commontask = () => {
     orbit.update()

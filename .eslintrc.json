@@ -24,9 +24,10 @@
         "comma-dangle": [ 1, "always-multiline" ],
         "function-call-argument-newline": [ 1, "consistent" ],
         "function-paren-newline": [ 1, "consistent" ],
-        "indent": [ 1, 2 ],
+        "indent": [ 1, 2, {
+            "SwitchCase": 1
+        }],
         "linebreak-style": [ 1, "unix" ],
-        "no-unused-vars": [ 1, { "vars": "local" }],
         "object-curly-newline": [ 1, {
             "multiline": true,
             "consistent": true	
