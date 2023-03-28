@@ -31,6 +31,7 @@
     "cannon-es": "^0.20.0",
     "dat.gui": "^0.7.9",
     "gsap": "^3.10.4",
+    "lil-gui": "^0.18.1",
     "poisson-disk-sampling": "^2.3.1",
     "simplex-noise": "^4.0.0",
     "three": "^0.150.1"
