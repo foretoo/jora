@@ -1,6 +1,6 @@
-import { Body, ContactMaterial, ConvexPolyhedron, Material, Plane, Quaternion, SAPBroadphase, Trimesh, Vec3, World } from "cannon-es"
-import { getRandomBallPoint, random } from "../../utils"
-import { IData, N, tetrahedronIndices, tetrahedronVertices, timeStep } from "./constants"
+import { Body, ContactMaterial, ConvexPolyhedron, Material, Plane, Quaternion, SAPBroadphase, Vec3, World } from "cannon-es"
+import { getRandomBallPoint, random } from "utils"
+import { CANNON_RADIUS, IData, N, tetrahedronIndices, tetrahedronVertices, timeStep } from "./constants"
 
 declare const self: Worker
 
@@ -45,9 +45,9 @@ for (let i = 0; i < tetrahedronIndices.length / 3; i++) {
 }
 for (let i = 0; i < tetrahedronVertices.length / 3; i++) {
   vertices.push(new Vec3(
-    tetrahedronVertices[i * 3 + 0],
-    tetrahedronVertices[i * 3 + 1],
-    tetrahedronVertices[i * 3 + 2],
+    tetrahedronVertices[i * 3 + 0] * CANNON_RADIUS,
+    tetrahedronVertices[i * 3 + 1] * CANNON_RADIUS,
+    tetrahedronVertices[i * 3 + 2] * CANNON_RADIUS,
   ))
 }
 

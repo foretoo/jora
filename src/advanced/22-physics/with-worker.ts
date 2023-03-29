@@ -1,7 +1,7 @@
 import { AmbientLight, BufferAttribute, BufferGeometry, DirectionalLight, Euler, Group, InstancedMesh, Matrix4, Mesh, MeshBasicMaterial, MeshPhongMaterial, Object3D, TetrahedronGeometry, Vector3 } from "three"
 import Stats from "three/examples/jsm/libs/stats.module.js"
 import { camera, scene } from "init"
-import { IData, N, tetrahedronIndices, tetrahedronVertices, timeStep } from "./constants"
+import { CANNON_RADIUS, IData, N, tetrahedronIndices, tetrahedronVertices, timeStep } from "./constants"
 
 
 
@@ -20,7 +20,7 @@ const gizmo = new Object3D()
 let sendTime: number
 
 camera.position.z = 5
-const vertices = new Float32Array(tetrahedronVertices)
+const vertices = new Float32Array(tetrahedronVertices.map((v) => v * CANNON_RADIUS))
 
 const a_light = new AmbientLight(0xffffff, 0.2)
 const d_light = new DirectionalLight(0xffffff, 0.8)
