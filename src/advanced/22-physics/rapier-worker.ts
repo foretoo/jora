@@ -1,5 +1,6 @@
 import type { RigidBody } from "@dimforge/rapier3d"
 import { BODY_RADIUS, CONTAINER_RADIUS, IDataWithRapier, MAX, N, tetrahedronIndices, tetrahedronVertices } from "./constants"
+import { randomBallPoint, randomQuaternion } from "utils"
 
 declare const self: Worker
 
@@ -33,11 +34,8 @@ const bodies: RigidBody[] = []
 
 for (let i = 0; i < MAX; i++) {
   const body = world.createRigidBody(tetraBodyDesc)
-  body.setTranslation({
-    x: Math.random() - 0.5,
-    y: Math.random() - 0.5,
-    z: Math.random() - 0.5,
-  }, false)
+  body.setTranslation(randomBallPoint(CONTAINER_RADIUS / 3 - BODY_RADIUS), false)
+  body.setRotation(randomQuaternion(), false)
   world.createCollider(tetraColliderDesc, body)
   bodies.push(body)
 
@@ -50,15 +48,15 @@ const containerBodyDesc = RAPIER.RigidBodyDesc.kinematicVelocityBased()
 const containerBody = world.createRigidBody(containerBodyDesc)
 containerBody.setAngvel(new RAPIER.Vector3(-1, 0, 1), false)
 
-const vs = tetrahedronVertices.map((v) => v * CONTAINER_RADIUS * (1 / Math.sqrt(3)))
+const vs = tetrahedronVertices.map((v) => v * CONTAINER_RADIUS * (1 / Math.sqrt(3)) / 3)
 
 for (let i = 0; i < 4; i++) {
   let [ i1, i2, i3 ] = tetrahedronIndices.slice(i * 3, i * 3 + 3)
   i1 *= 3; i2 *= 3; i3 *= 3
 
-  const px = (vs[i1 + 0] + vs[i2 + 0] + vs[i3 + 0]) / 3
-  const py = (vs[i1 + 1] + vs[i2 + 1] + vs[i3 + 1]) / 3
-  const pz = (vs[i1 + 2] + vs[i2 + 2] + vs[i3 + 2]) / 3
+  const px = vs[i1 + 0] + vs[i2 + 0] + vs[i3 + 0]
+  const py = vs[i1 + 1] + vs[i2 + 1] + vs[i3 + 1]
+  const pz = vs[i1 + 2] + vs[i2 + 2] + vs[i3 + 2]
 
   const nl = -1 / Math.sqrt(px ** 2 + py ** 2 + pz ** 2)
   const [ nx, ny, nz ] = [ px * nl, py * nl, pz * nl ]
@@ -90,11 +88,8 @@ self.onmessage = (e: MessageEvent<IDataWithRapier>) => {
   }
   else if (deltaN > 0) {
     for (let i = data.n - deltaN; i < data.n; i++) {
-      bodies[i].setTranslation({
-        x: Math.random() - 0.5,
-        y: Math.random() - 0.5,
-        z: Math.random() - 0.5,
-      }, false)
+      bodies[i].setTranslation(randomBallPoint(CONTAINER_RADIUS / 3 - BODY_RADIUS), false)
+      bodies[i].setRotation(randomQuaternion(), false)
       bodies[i].setEnabled(true)
     }
   }

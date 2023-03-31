@@ -27,7 +27,6 @@ for (let i = 0; i < N * 3; i += 3) {
 ////////
 //////// PHYSIC
 
-
 const AMMO = await Ammo(config) as Awaited<ReturnType<typeof Ammo>>
 
 // World

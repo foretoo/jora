@@ -33,7 +33,7 @@ export function clamp(
   return Math.max(Math.min(value, max), min)
 }
 
-export function getRandomBallPoint(
+export function randomBallPoint(
   radius = 1,
 ) {
   const u = Math.random()
@@ -65,10 +65,11 @@ export const randomQuaternion = () => {
 
   const u3 = 2 * Math.PI * Math.random()
 
-  return [
-    sqrt1u1 * Math.cos( u2 ),
-    sqrtu1 * Math.sin( u3 ),
-    sqrtu1 * Math.cos( u3 ),
-    sqrt1u1 * Math.sin( u2 ),
-  ] as const
+  return {
+    x: sqrt1u1 * Math.cos( u2 ),
+    y: sqrtu1 * Math.sin( u3 ),
+    z: sqrtu1 * Math.cos( u3 ),
+    w: sqrt1u1 * Math.sin( u2 ),
+  }
 }
+

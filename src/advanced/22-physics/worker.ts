@@ -1,5 +1,5 @@
 import { Body, ContactMaterial, ConvexPolyhedron, Material, Plane, Quaternion, SAPBroadphase, Vec3, World } from "cannon-es"
-import { getRandomBallPoint, random } from "utils"
+import { randomBallPoint, random } from "utils"
 import { CANNON_RADIUS, IData, N, tetrahedronIndices, tetrahedronVertices, timeStep } from "./constants"
 
 declare const self: Worker
@@ -57,7 +57,7 @@ for (let i = 0; i < N; i++) {
   const body = new Body({ mass: 1 })
   body.addShape(tetrahedronShape)
   body.quaternion.setFromEuler(random(Math.PI), random(Math.PI), random(Math.PI)).normalize()
-  const { x, y, z } = getRandomBallPoint()
+  const { x, y, z } = randomBallPoint()
   body.position.set(x, y, z)
   bodies.push(body)
   world.addBody(body)

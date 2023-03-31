@@ -69,6 +69,7 @@ const worker = new RapierWorker()
 let data: IDataWithRapier
 let sendTime: number
 let deltaN = 0
+let lastN = options.n
 
 const requestWorkerData = () => {
   stats.begin()
@@ -79,16 +80,28 @@ const requestWorkerData = () => {
 worker.onmessage = (e: MessageEvent<IDataWithRapier>) => {
   data = e.data
 
-  deltaN = options.n - data.n
-  meshes.count = data.n = options.n
-
   copyData(0, data.transfer, container)
+
+  deltaN = lastN - data.n
+  meshes.count = lastN = data.n
+
+  if (deltaN < 0) {
+    setGizmoScale(0)
+    for (let i = lastN; i < lastN - deltaN; i++) {
+      meshes.setMatrixAt(i, gizmo.matrix)
+    }
+    setGizmoScale(1)
+  }
+
   for (let i = 0; i < data.n; i++) {
     copyData(i + 1, data.transfer, gizmo)
     gizmo.updateMatrix()
     meshes.setMatrixAt(i, gizmo.matrix)
   }
+
   meshes.instanceMatrix.needsUpdate = true
+
+  data.n = options.n
 
   const delay = timeStep * 1000 - (performance.now() - sendTime)
   setTimeout(requestWorkerData, Math.max(delay, 0))
@@ -120,33 +133,11 @@ function copyData(
   )
 }
 
-
-
-function setScale(
-  i: number,
-  scale: number,
-  gizmo: Object3D,
-  meshes: InstancedMesh,
-) {
-  gizmo.scale.set(scale, scale, scale)
+function setGizmoScale(v: number) {
+  gizmo.scale.set(v, v, v)
   gizmo.updateMatrix()
-  meshes.setMatrixAt(i, gizmo.matrix)
 }
 
 
 
-export const play = () => {
-  if (deltaN === 0) return
-
-  if (deltaN > 0) {
-    for (let i = options.n - deltaN; i < options.n; i++) {
-      setScale(i, 1, gizmo, meshes)
-    }
-  }
-  else {
-    for (let i = options.n; i < options.n - deltaN; i++) {
-      setScale(i, 0, gizmo, meshes)
-    }
-    gizmo.scale.set(1, 1, 1)
-  }
-}
+export const play = () => {}

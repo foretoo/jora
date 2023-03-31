@@ -16,11 +16,11 @@ export const tetrahedronIndices = [
 
 
 
-export const N = 200
-export const MAX = 400
+export const N = 300
+export const MAX = 600
 
 export const timeStep = 1 / 60
 
 export const CANNON_RADIUS = 0.1618
-export const CONTAINER_RADIUS = Math.SQRT2
-export const BODY_RADIUS = (1 - Math.SQRT1_2) * Math.cbrt(200 / MAX) * 0.618
+export const CONTAINER_RADIUS = Math.sqrt(3)
+export const BODY_RADIUS = 0.128 * Math.cbrt(200 / MAX) * CONTAINER_RADIUS
