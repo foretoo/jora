@@ -11,8 +11,9 @@
     "skipLibCheck": true,
     "paths": {
       "init": ["./src/init.ts"],
-      "utils": ["./src/utils.ts"],
+      "local/*": ["./.local/"],
       "misc/*": ["./src/misc/*"],
+      "utils": ["./src/utils.ts"],
       "vendors/*": ["./dist/vendors/*"]
     }
   },

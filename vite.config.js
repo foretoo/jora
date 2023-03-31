@@ -16,12 +16,14 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      misc: "/src/misc",
       init: "/src/init.ts",
+      local: "/.local",
+      misc: "/src/misc",
       utils: "/src/utils.ts",
-      vendors: "/dist/vendors"
+      vendors: "/dist/vendors",
     },
   },
+  optimizeDeps: { entries: "/src/index.html" },
 
   build: {
     rollupOptions: {
@@ -62,5 +64,5 @@ export default defineConfig({
       wasm(),
       topLevelAwait(),
     ],
-  }
+  },
 })

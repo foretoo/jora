@@ -1,6 +1,6 @@
 import { ACESFilmicToneMapping, Mesh, MeshStandardMaterial, PerspectiveCamera, PMREMGenerator, SphereGeometry, sRGBEncoding, WebGLRenderer } from "three"
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
-import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment'
+import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment"
 
 
 
@@ -22,7 +22,7 @@ renderer.toneMapping = ACESFilmicToneMapping
 onresize = () => {
   camera.aspect = innerWidth / innerHeight
   camera.updateProjectionMatrix()
-  renderer.setSize(innerWidth, innerHeight)  
+  renderer.setSize(innerWidth, innerHeight)
 }
 
 const controls = new OrbitControls(camera, canvas)
@@ -38,9 +38,9 @@ environment.add(
     new MeshStandardMaterial({
       metalness: 0,
       roughness: 1,
-      envMap: pmremGenerator.fromScene(environment,0).texture,
+      envMap: pmremGenerator.fromScene(environment, 0).texture,
     }),
-  )
+  ),
 )
 
 

@@ -1,4 +1,4 @@
-import { OrthographicCamera, PerspectiveCamera, Scene, WebGLRenderer } from "three"
+import { ACESFilmicToneMapping, OrthographicCamera, PerspectiveCamera, Scene, WebGLRenderer, sRGBEncoding } from "three"
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
 
 
@@ -35,6 +35,8 @@ const orbit = new OrbitControls(camera, canvas)
 const renderer = new WebGLRenderer({ canvas, antialias: true })
 renderer.setSize(innerWidth, innerHeight)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+renderer.outputEncoding = sRGBEncoding
+renderer.toneMapping = ACESFilmicToneMapping
 
 addEventListener("resize", () => {
   aspect = innerWidth / innerHeight
