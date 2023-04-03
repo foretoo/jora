@@ -1,4 +1,4 @@
-const nd = 3
+const nd = 8
 export const unitGRandom = () => {
   let rand = 0
   for (let i = 0; i < nd; i++) {
