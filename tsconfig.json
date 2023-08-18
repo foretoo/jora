@@ -9,13 +9,15 @@
     "isolatedModules": true,
     "noEmit": true,
     "skipLibCheck": true,
+
+    "baseUrl": "./",
     "paths": {
-      "init": ["./src/init.ts"],
-      "local/*": ["./.local/"],
-      "misc/*": ["./src/misc/*"],
-      "utils": ["./src/utils.ts"],
-      "vendors/*": ["./dist/vendors/*"]
-    }
+      "init": ["src/init.ts"],
+      "local/*": [".local/"],
+      "misc/*": ["src/misc/*"],
+      "utils": ["src/utils.ts"],
+      "vendors/*": ["dist/vendors/*"]
+    },
   },
   "include": ["src", "types"]
 }
