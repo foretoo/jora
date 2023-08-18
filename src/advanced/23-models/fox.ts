@@ -16,7 +16,6 @@ scene.fog = new Fog(scene.background, FAR / 2, FAR)
 
 renderer.shadowMap.enabled = true
 renderer.shadowMap.type = PCFSoftShadowMap
-renderer.physicallyCorrectLights = true
 
 // orbit.maxAzimuthAngle = Math.PI / 3 * 2
 // orbit.minAzimuthAngle = -Math.PI / 3 * 2

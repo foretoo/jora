@@ -16,7 +16,6 @@ camera.position.set(0, 2, 5)
 const renderer = new WebGLRenderer({ canvas })
 renderer.setSize(innerWidth, innerHeight)
 renderer.setPixelRatio(Math.min(devicePixelRatio, 2))
-renderer.outputEncoding = sRGBEncoding
 renderer.toneMapping = ACESFilmicToneMapping
 
 onresize = () => {

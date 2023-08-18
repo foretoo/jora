@@ -4,17 +4,17 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
 
 
 // Canvas
-const canvas = document.querySelector("canvas")!
+export const canvas = document.querySelector("canvas")!
 
 
 // Scene
-const scene = new Scene()
+export const scene = new Scene()
 
 
 // Camera
 let aspect = innerWidth / innerHeight
-const camera = new PerspectiveCamera(60, aspect, 0.1, 100)
-// const camera = new OrthographicCamera(-aspect, aspect, 1, -1, 0.1, 100)
+export const camera = new PerspectiveCamera(60, aspect, 0.1, 100)
+// export const camera = new OrthographicCamera(-aspect, aspect, 1, -1, 0.1, 100)
 
 export const logs = document.querySelector("#logs")! as Element & { addCameraListener(): void }
 logs.addCameraListener = () => {
@@ -28,14 +28,13 @@ logs.addCameraListener = () => {
   })
 }
 
-const orbit = new OrbitControls(camera, canvas)
+export const orbit = new OrbitControls(camera, canvas)
 
 
 // Renderer
-const renderer = new WebGLRenderer({ canvas, antialias: true })
+export const renderer = new WebGLRenderer({ canvas, antialias: true })
 renderer.setSize(innerWidth, innerHeight)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-renderer.outputEncoding = sRGBEncoding
 renderer.toneMapping = ACESFilmicToneMapping
 
 addEventListener("resize", () => {
@@ -62,7 +61,7 @@ window.onkeydown = (e: KeyboardEvent) => {
   }
 }
 let _callback: FrameRequestCallback | undefined
-const loop = (callback?: FrameRequestCallback) => {
+export const loop = (callback?: FrameRequestCallback) => {
   _callback = callback
   const commontask = () => {
     orbit.update()
@@ -84,13 +83,4 @@ const loop = (callback?: FrameRequestCallback) => {
     looping && requestAnimationFrame(callbackLooper)
   }
   requestAnimationFrame(callbackLooper)
-}
-
-export {
-  scene,
-  camera,
-  orbit,
-  renderer,
-  canvas,
-  loop,
 }

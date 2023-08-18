@@ -13,5 +13,4 @@ declare module "*.fs" {
   export default shader
 }
 
-type _TupleOf<T, N extends number, R extends unknown[]> = R['length'] extends N ? R : _TupleOf<T, N, [T, ...R]>;
-type Tuple<T, N extends number> = N extends N ? (number extends N ? T[] : _TupleOf<T, N, []>) : never;
+type Tuple<T, N extends number, R = []> = R["length"] extends N ? R : Tuple<T, N, [T, ...R]>
